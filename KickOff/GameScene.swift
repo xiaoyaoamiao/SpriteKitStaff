@@ -14,6 +14,7 @@ class GameScene: SKScene {
     var mapHeight:CGFloat = 0.0
     var recRange1_Location:CGPoint?
     var recRange2_Location:CGPoint?
+    var centerPoint:CGPoint?
     var pointsLocation:[CGPoint] = [CGPoint]()
     var skNodeLocation:[String] = [String](arrayLiteral: "1","1","1","x","x","0","0","0","0","x","x","1")
     let chessScale:CGFloat = 0.6
@@ -28,11 +29,12 @@ class GameScene: SKScene {
     //Phycics
     
     override func didMoveToView(view: SKView) {
+        centerPoint = CGPoint(x:CGRectGetMidX(self.frame),y:CGRectGetMidY(self.frame))
         self.removeAllChildren()
         paintBackGround()
         displayInitSKNode()
     }
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesBegan(touches: NSSet, withEvent event: UIEvent?) {
        /* Called when a touch begins */
         let location = (touches as NSSet).anyObject()!.locationInNode(self)
         let node = nodeAtPoint(location)
@@ -42,6 +44,7 @@ class GameScene: SKScene {
             if touched_node!.name!.hasPrefix("red") || touched_node!.name!.hasPrefix("green")
             {
                 for a in self.children{
+                    var a = a as SKNode
                     if a.name != nil{
                         if a.name!.hasPrefix("red") || a.name!.hasPrefix("green"){
                             a.setScale(chessScale)
@@ -51,6 +54,7 @@ class GameScene: SKScene {
                 node.setScale(chessScale_focus)
             }else{
                 for a in self.children{
+                    var a = a as SKNode
                     if a.name != nil{
                         if a.name!.hasPrefix("red") || a.name!.hasPrefix("green"){
                             a.setScale(chessScale)
@@ -69,6 +73,7 @@ class GameScene: SKScene {
         bg.alpha = 0.2
         bg.setScale(1.5)
         bg.size = CGSize(width: self.size.width/2, height: self.size.height/2)
+        bg.name = "backGround"
         self.addChild(bg)
     }
     
@@ -124,6 +129,8 @@ class GameScene: SKScene {
         recRange2.lineWidth = 5.0
         recRange1.position = recRange1_Location!
         recRange2.position = recRange2_Location!
+        recRange1.name = "map1"
+        recRange2.name = "map2"
         self.addChild(recRange1)
         self.addChild(recRange2)
         
@@ -175,46 +182,109 @@ class GameScene: SKScene {
         self.addChild(greenSprite)
         //print(firstPoint)
         //判断是上下左右
-        switch (direction){
-        case UISwipeGestureRecognizerDirection.Left:
-            self.direction_temp = UISwipeGestureRecognizerDirection.Left
-            if touched_node != nil && touched_node!.name != nil{
-                if touched_node!.name!.hasPrefix("red") || touched_node!.name!.hasPrefix("green")
-                {
-                    var newLocation = touched_location
-                    newLocation?.x -= mapWidth
-                    DeterminSpriteNodeAction(newLocation!,direction: direction_temp!)
+        print(touched_node)
+        self.direction_temp = sender.direction
+        if touched_node != nil && touched_node!.name != nil{
+            if touched_node!.name!.hasPrefix("red") || touched_node!.name!.hasPrefix("green")
+            {
+                let moveOrNot = DeterminSpriteNodeAction(touched_location!,direction: sender.direction)
+                switch(moveOrNot){
+                case 0:
+                    var newLocation = touched_location!
+                    newLocation = newLocation as CGPoint
+                    newLocation.x -= mapWidth
+                    var moveToAction = SKAction.moveTo(newLocation, duration: 3)
+                    touched_node?.runAction(moveToAction)
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+                default:
+                    break;
                 }
             }
-//            print("\(direction)----\(firstPoint)")
+        }
+
+    }
+    
+    //Determin sknode and move or not
+    //move: 1 --> temp1 have no node and available
+    //cannot move: 0 --> temp 1 have node and temp2 have no node
+    //Kick Off: 2 --> temp1 have node and temp2 have enemy node
+    func DeterminSpriteNodeAction(nodeLocation:CGPoint,direction:UISwipeGestureRecognizerDirection)->Int{
+        
+        var nodeTemp1 = nodeAtPoint(nodeLocation)
+        var nodeTemp2 = nodeAtPoint(CGPoint(x: nodeLocation.x+mapWidth, y: nodeLocation.y))
+        
+        switch (direction){
+        case UISwipeGestureRecognizerDirection.Left:
+            nodeTemp1 = nodeAtPoint(CGPoint(x: nodeLocation.x-mapWidth, y: nodeLocation.y))
+            nodeTemp2 = nodeAtPoint(CGPoint(x: nodeLocation.x-mapWidth*2, y: nodeLocation.y))
             break
         case UISwipeGestureRecognizerDirection.Right:
-            //print("\(direction)----\(firstPoint)")
+            nodeTemp1 = nodeAtPoint(CGPoint(x: nodeLocation.x+mapWidth, y: nodeLocation.y))
+            nodeTemp2 = nodeAtPoint(CGPoint(x: nodeLocation.x+mapWidth*2, y: nodeLocation.y))
             break
         case UISwipeGestureRecognizerDirection.Up:
-            //print("\(direction)----\(firstPoint)")
+            nodeTemp1 = nodeAtPoint(CGPoint(x: nodeLocation.x, y: nodeLocation.y+mapWidth))
+            nodeTemp2 = nodeAtPoint(CGPoint(x: nodeLocation.x, y: nodeLocation.y+mapWidth*2))
             break
         case UISwipeGestureRecognizerDirection.Down:
-            //print("\(direction)----\(firstPoint)")
+            nodeTemp1 = nodeAtPoint(CGPoint(x: nodeLocation.x, y: nodeLocation.y-mapWidth))
+            nodeTemp2 = nodeAtPoint(CGPoint(x: nodeLocation.x, y: nodeLocation.y-mapWidth*2))
             break
         default:
             break;
         }
-    }
-    
-    //Determin sknode and move or not
-    func DeterminSpriteNodeAction(nodeLocation:CGPoint,direction:UISwipeGestureRecognizerDirection)->SKNode?{
-//        let touchedNode = self.nodesAtPoint(firstTouch)
-//        print(touchedNode)
-//        if let name = touchedNode.name
-//        {
-//            print(name)
-//        }
+        
 
-        return nil
+        
+        if nodeTemp1.name!.hasPrefix("red") || nodeTemp1.name!.hasPrefix("green")
+        {
+            if touched_node?.name != nodeTemp1.name{
+                return 0
+            }else{
+                if nodeTemp1.name != nodeTemp2.name{
+                    return 2
+                }else{
+                    return 0
+                }
+            }
+       }else if contains(pointsLocation, nodeTemp1.position){
+            return 1
+       }
+       return 0
     }
    
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
