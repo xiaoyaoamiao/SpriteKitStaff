@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate{
     var width_blank_space:CGFloat = 0.0
     var mapWidth:CGFloat = 0
     var mapHeight:CGFloat = 0
@@ -27,6 +27,10 @@ class GameScene: SKScene {
     var moveOrder:Bool = true
     
     //Phycics
+    struct physicsCategoryStruct {
+        static let chessCategory:UInt32 = 0b1 //1
+    }
+    
     
     override func didMoveToView(view: SKView) {
         centerPoint = CGPoint(x:CGRectGetMidX(self.frame),y:CGRectGetMidY(self.frame))
@@ -133,6 +137,8 @@ class GameScene: SKScene {
         self.addChild(recRange1)
         self.addChild(recRange2)
         
+        
+        //Add swip gesture
         let swipLeftGestureRecognizer = UISwipeGestureRecognizer(target: self, action: "handleSwipeGesture:")
         swipLeftGestureRecognizer.direction = UISwipeGestureRecognizerDirection.Left
         let swipRightGestureRecognizer = UISwipeGestureRecognizer(target: self, action: "handleSwipeGesture:")
@@ -146,6 +152,10 @@ class GameScene: SKScene {
         self.view?.addGestureRecognizer(swipUpGestureRecognizer)
         self.view?.addGestureRecognizer(swipDownGestureRecognizer)
         
+        //init physices area
+        self.physicsWorld.gravity = CGVectorMake(0,0)
+        physicsWorld.contactDelegate = self
+        
         for i in 0...11 {
             switch skNodeLocation[i]{
             case "1":
@@ -155,6 +165,11 @@ class GameScene: SKScene {
                 redSprite.physicsBody = SKPhysicsBody(circleOfRadius: redSprite.size.width/2)
                 redSprite.physicsBody?.affectedByGravity = false
                 redSprite.name = "red_\(i)"
+                
+                redSprite.physicsBody = SKPhysicsBody(circleOfRadius: redSprite.size.height/2)
+                redSprite.physicsBody?.dynamic = true
+                redSprite.physicsBody?.categoryBitMask = physicsCategoryStruct.chessCategory
+                redSprite.physicsBody?.contactTestBitMask = physicsCategoryStruct.chessCategory
                 self.addChild(redSprite)
             case "0":
                 let greenSprite = SKSpriteNode(imageNamed:"green")
@@ -163,6 +178,11 @@ class GameScene: SKScene {
                 greenSprite.physicsBody = SKPhysicsBody(circleOfRadius: greenSprite.size.width/2)
                 greenSprite.physicsBody?.affectedByGravity = false
                 greenSprite.name = "green_\(i)"
+                
+                greenSprite.physicsBody = SKPhysicsBody(circleOfRadius: greenSprite.size.height/2)
+                greenSprite.physicsBody?.dynamic = true
+                greenSprite.physicsBody?.categoryBitMask = physicsCategoryStruct.chessCategory
+                greenSprite.physicsBody?.contactTestBitMask = physicsCategoryStruct.chessCategory
                 self.addChild(greenSprite)
             default:
                 continue
@@ -173,7 +193,7 @@ class GameScene: SKScene {
     func handleSwipeGesture(sender: UISwipeGestureRecognizer){
         //划动的方向
 //       let direction = sender.direction
-//        let firstPoint = sender.locationOfTouch(sender.numberOfTouches()-1, inView: self.view)
+//       let firstPoint = sender.locationOfTouch(sender.numberOfTouches()-1, inView: self.view)
 
         self.direction_temp = sender.direction
         if touched_node != nil && touched_node!.name != nil
@@ -187,11 +207,62 @@ class GameScene: SKScene {
                 case 1:
                     var newLocation = touched_location!
                     newLocation = newLocation as CGPoint
-                    newLocation.x -= mapWidth
+
+                    switch (direction_temp){
+                    case UISwipeGestureRecognizerDirection.Left?:
+                        newLocation.x -= mapWidth
+                        break
+                    case UISwipeGestureRecognizerDirection.Right?:
+                        newLocation.x += mapWidth
+                        break
+                    case UISwipeGestureRecognizerDirection.Up?:
+                        newLocation.y += mapWidth
+                        break
+                    case UISwipeGestureRecognizerDirection.Down?:
+                        newLocation.y -= mapWidth
+                        break
+                    default:
+                        break;
+                    }
                     let moveToAction = SKAction.moveTo(newLocation, duration: 1)
-                    touched_node?.runAction(moveToAction)
+                    let scaleAction = SKAction.scaleTo(chessScale, duration: 0.5)
+                    let ActionGroup = SKAction.group([moveToAction,scaleAction])
+                    touched_node?.runAction(ActionGroup)
                     break;
                 case 2:
+                    var newLocation = touched_location!
+                    newLocation = newLocation as CGPoint
+                    var newLocation_2 = touched_location!
+                    newLocation_2 = newLocation_2 as CGPoint
+                    
+                    switch (direction_temp){
+                    case UISwipeGestureRecognizerDirection.Left?:
+                        newLocation.x -= mapWidth
+                        newLocation_2.x -= mapWidth*2
+                        break
+                    case UISwipeGestureRecognizerDirection.Right?:
+                        newLocation.x += mapWidth
+                        newLocation_2.x += mapWidth*2
+                        break
+                    case UISwipeGestureRecognizerDirection.Up?:
+                        newLocation.y += mapWidth
+                        newLocation_2.y += mapWidth*2
+                        break
+                    case UISwipeGestureRecognizerDirection.Down?:
+                        newLocation.y -= mapWidth
+                        newLocation_2.y -= mapWidth*2
+                        break
+                    default:
+                        break;
+                    }
+                    let kicked_node = nodeAtPoint(newLocation)
+                    let touched_node_moveToAction = SKAction.moveTo(newLocation, duration: 1)
+                    let scaleAction = SKAction.scaleTo(chessScale, duration: 0.5)
+                    let ActionGroup = SKAction.group([touched_node_moveToAction,scaleAction])
+                    touched_node?.runAction(ActionGroup)
+                    let kicked_node_moveToAction = SKAction.moveTo(newLocation_2, duration: 1)
+                    kicked_node.runAction(kicked_node_moveToAction)
+                    
                     break;
                 default:
                     break;
@@ -211,7 +282,7 @@ class GameScene: SKScene {
         var nodeTemp2:SKNode?
         var nodeTemp1_position:CGPoint?
         var nodeTemp2_position:CGPoint?
-        print(nodeLocation)
+
         switch (direction){
         case UISwipeGestureRecognizerDirection.Left:
             nodeTemp1_position = CGPoint(x: nodeLocation.x-mapWidth, y: nodeLocation.y)
@@ -234,30 +305,33 @@ class GameScene: SKScene {
         }
         nodeTemp1 = nodeAtPoint(nodeTemp1_position!)
         nodeTemp2 = nodeAtPoint(nodeTemp2_position!)
-        print(nodeTemp1_position)
-        print(centerPoint!.y-3*mapWidth/2)
-        print(centerPoint)
-        var out1_1 = nodeTemp1_position!.x < centerPoint!.x-3*mapWidth/2
-        var out1_2 = nodeTemp1_position!.y < centerPoint!.y-3*mapWidth/2
-        var out2_1 = nodeTemp1_position!.x > centerPoint!.x+3*mapWidth/2
-        var out2_2 = nodeTemp1_position!.y > centerPoint!.y+3*mapWidth/2
+
+        let out1_1 = nodeTemp1_position!.x < centerPoint!.x-3*mapWidth/2-0.1
+        let out1_2 = nodeTemp1_position!.y < centerPoint!.y-3*mapWidth/2-0.1
+        let out2_1 = nodeTemp1_position!.x > centerPoint!.x+3*mapWidth/2+0.1
+        let out2_2 = nodeTemp1_position!.y > centerPoint!.y+3*mapWidth/2+0.1
         
-        var out3_1 = nodeTemp1_position!.x > centerPoint!.x+mapWidth/2
-        var out3_2 = nodeTemp1_position!.y < centerPoint!.y-mapWidth/2
-        var out4_1 = nodeTemp1_position!.x > centerPoint!.x+mapWidth/2
-        var out4_2 = nodeTemp1_position!.y > centerPoint!.y+mapWidth/2
-        var out5_1 = nodeTemp1_position!.x < centerPoint!.x-mapWidth/2
-        var out5_2 = nodeTemp1_position!.y > centerPoint!.y+mapWidth/2
-        var out6_1 = nodeTemp1_position!.x < centerPoint!.x-mapWidth/2
-        var out6_2 = nodeTemp1_position!.y < centerPoint!.y-mapWidth/2
+        let out3_1 = nodeTemp1_position!.x > centerPoint!.x+mapWidth/2+0.1
+        let out3_2 = nodeTemp1_position!.y < centerPoint!.y-mapWidth/2-0.1
+        let out4_1 = nodeTemp1_position!.x > centerPoint!.x+mapWidth/2+0.1
+        let out4_2 = nodeTemp1_position!.y > centerPoint!.y+mapWidth/2+0.1
+        let out5_1 = nodeTemp1_position!.x < centerPoint!.x-mapWidth/2-0.1
+        let out5_2 = nodeTemp1_position!.y > centerPoint!.y+mapWidth/2+0.1
+        let out6_1 = nodeTemp1_position!.x < centerPoint!.x-mapWidth/2-0.1
+        let out6_2 = nodeTemp1_position!.y < centerPoint!.y-mapWidth/2-0.1
+        
         if nodeTemp1 != nil && nodeTemp2 != nil{
             if nodeTemp1!.name!.hasPrefix("red") || nodeTemp1!.name!.hasPrefix("green")
             {
                 
                 if ((touched_node?.name)! as NSString).substringToIndex(2) != ((nodeTemp1!.name)! as NSString).substringToIndex(2){
                     return 0
+                }else if !nodeTemp2!.name!.hasPrefix("red") && !nodeTemp2!.name!.hasPrefix("green"){
+                    return 0
+                }else if(((nodeTemp2?.name)! as NSString).substringToIndex(2) == ((nodeTemp1!.name)! as NSString).substringToIndex(2))&&(((touched_node?.name)! as NSString).substringToIndex(2) == ((nodeTemp1!.name)! as NSString).substringToIndex(2)){
+                    return 0
                 }
-                if ((nodeTemp2!.name)! as NSString).substringToIndex(2) != ((nodeTemp1!.name)! as NSString).substringToIndex(2){
+                else if ((nodeTemp2!.name)! as NSString).substringToIndex(2) != ((nodeTemp1!.name)! as NSString).substringToIndex(2){
                     return 2
                 }else{
                     return 1
@@ -281,6 +355,36 @@ class GameScene: SKScene {
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
     }
+    
+    func didBeginContact(contact: SKPhysicsContact) {
+        
+        // 1
+        var firstBody: SKPhysicsBody?
+        var secondBody: SKPhysicsBody?
+        
+        firstBody = contact.bodyA
+        secondBody = contact.bodyB
+        
+        
+        let touched_node_temp = touched_node?.name
+        let touched_node_prefix = touched_node_temp?.substringToIndex((touched_node_temp!.characters.indexOf("_"))!)
+        
+        let firstBody_name = (firstBody!.node as! SKSpriteNode).name
+        let firstBody_name_prefix = firstBody_name?.substringToIndex(firstBody_name!.characters.indexOf("_")!)
+        
+        if(touched_node_prefix == firstBody_name_prefix)
+        {
+            firstBody = contact.bodyA
+            secondBody = contact.bodyB
+        }else{
+            firstBody = contact.bodyB
+            secondBody = contact.bodyA
+        }
+
+        (secondBody!.node as! SKSpriteNode).removeFromParent()
+        
+    }
+
 
 }
 
