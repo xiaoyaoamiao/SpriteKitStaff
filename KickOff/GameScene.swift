@@ -17,6 +17,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     var centerPoint:CGPoint?
     var pointsLocation:[CGPoint] = [CGPoint]()
     var skNodeLocation:[String] = [String](arrayLiteral: "1","1","1","x","x","0","0","0","0","x","x","1")
+    var chessArray:[SKSpriteNode] = [SKSpriteNode]()
     let chessScale:CGFloat = 0.6
     let chessScale_focus:CGFloat = 0.7
     //
@@ -27,6 +28,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     var moveOrder:Bool = true
     
     //Phycics
+    var SKPhysicsJointLimitTest:SKPhysicsJointLimit?
+    
+    
     struct physicsCategoryStruct {
         static let chessCategory:UInt32 = 0b1 //1
     }
@@ -162,27 +166,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                 let redSprite = SKSpriteNode(imageNamed:"red")
                 redSprite.setScale(0.6)
                 redSprite.position = pointsLocation[i]
+                //redSprite.anchorPoint = (x: redSprite.size.height/2, y: redSprite.size.width/2)
                 redSprite.physicsBody = SKPhysicsBody(circleOfRadius: redSprite.size.width/2)
                 redSprite.physicsBody?.affectedByGravity = false
                 redSprite.name = "red_\(i)"
-                
+                redSprite.physicsBody!.dynamic = true
                 redSprite.physicsBody = SKPhysicsBody(circleOfRadius: redSprite.size.height/2)
                 redSprite.physicsBody?.dynamic = true
                 redSprite.physicsBody?.categoryBitMask = physicsCategoryStruct.chessCategory
                 redSprite.physicsBody?.contactTestBitMask = physicsCategoryStruct.chessCategory
+                chessArray.append(redSprite)
                 self.addChild(redSprite)
             case "0":
                 let greenSprite = SKSpriteNode(imageNamed:"green")
                 greenSprite.setScale(0.6)
                 greenSprite.position = pointsLocation[i]
+                //greenSprite.anchorPoint = pointsLocation[i]
                 greenSprite.physicsBody = SKPhysicsBody(circleOfRadius: greenSprite.size.width/2)
                 greenSprite.physicsBody?.affectedByGravity = false
+                greenSprite.physicsBody!.dynamic = true
                 greenSprite.name = "green_\(i)"
                 
                 greenSprite.physicsBody = SKPhysicsBody(circleOfRadius: greenSprite.size.height/2)
                 greenSprite.physicsBody?.dynamic = true
                 greenSprite.physicsBody?.categoryBitMask = physicsCategoryStruct.chessCategory
                 greenSprite.physicsBody?.contactTestBitMask = physicsCategoryStruct.chessCategory
+                chessArray.append(greenSprite)
                 self.addChild(greenSprite)
             default:
                 continue
@@ -203,6 +212,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                 let moveOrNot = DeterminSpriteNodeAction(touched_location!,direction: sender.direction)
                 switch(moveOrNot){
                 case 0:
+                    var newLocation = touched_location!
+                    newLocation = newLocation as CGPoint
+                    
+                    switch (direction_temp){
+                    case UISwipeGestureRecognizerDirection.Left?:
+                        newLocation.x -= mapWidth/4
+                        break
+                    case UISwipeGestureRecognizerDirection.Right?:
+                        newLocation.x += mapWidth/4
+                        break
+                    case UISwipeGestureRecognizerDirection.Up?:
+                        newLocation.y += mapWidth/4
+                        break
+                    case UISwipeGestureRecognizerDirection.Down?:
+                        newLocation.y -= mapWidth/4
+                        break
+                    default:
+                        break;
+                    }
+                    let moveToAction = SKAction.moveTo(newLocation, duration: 0.3)
+                    let scaleAction = SKAction.scaleTo(chessScale, duration: 0.3)
+                    let moveBack = SKAction.moveTo(touched_location!, duration: 0.5)
+                    let ActionGroup = SKAction.group([moveToAction,scaleAction])
+                    let actionSequence = SKAction.sequence([ActionGroup,moveBack])
+                    touched_node?.runAction(actionSequence)
                     break;
                 case 1:
                     var newLocation = touched_location!
@@ -255,13 +289,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                     default:
                         break;
                     }
-                    let kicked_node = nodeAtPoint(newLocation)
+                    //let kicked_node = nodeAtPoint(newLocation)
                     let touched_node_moveToAction = SKAction.moveTo(newLocation, duration: 1)
                     let scaleAction = SKAction.scaleTo(chessScale, duration: 0.5)
                     let ActionGroup = SKAction.group([touched_node_moveToAction,scaleAction])
                     touched_node?.runAction(ActionGroup)
-                    let kicked_node_moveToAction = SKAction.moveTo(newLocation_2, duration: 1)
-                    kicked_node.runAction(kicked_node_moveToAction)
+//                    let kicked_node_moveToAction = SKAction.moveTo(newLocation_2, duration: 1)
+//                    kicked_node.runAction(kicked_node_moveToAction)
                     
                     break;
                 default:
@@ -379,9 +413,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         }else{
             firstBody = contact.bodyB
             secondBody = contact.bodyA
+            kickOffAnimation(secondBody!.node as! SKSpriteNode)
         }
-
-        (secondBody!.node as! SKSpriteNode).removeFromParent()
+    }
+    
+    func kickOffAnimation(spriteNode:SKSpriteNode){
+        var transform:CGAffineTransform = CGAffineTransformMakeTranslation(spriteNode.position.x, spriteNode.position.y);
+        let path =  CGPathCreateMutable()
+        CGPathMoveToPoint(path, &transform, 0, 0)
+        CGPathAddLineToPoint(path, &transform, 0, 75)
+        CGPathAddLineToPoint(path, &transform, 75, 75)
+        CGPathAddArc(path, &transform, 0, 75, 75, 0, CGFloat(1.5 * M_PI), false)
         
     }
 
