@@ -172,7 +172,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                 redSprite.name = "red_\(i)"
                 redSprite.physicsBody!.dynamic = true
                 redSprite.physicsBody = SKPhysicsBody(circleOfRadius: redSprite.size.height/2)
-                redSprite.physicsBody?.dynamic = true
                 redSprite.physicsBody?.categoryBitMask = physicsCategoryStruct.chessCategory
                 redSprite.physicsBody?.contactTestBitMask = physicsCategoryStruct.chessCategory
                 chessArray.append(redSprite)
@@ -184,7 +183,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                 //greenSprite.anchorPoint = pointsLocation[i]
                 greenSprite.physicsBody = SKPhysicsBody(circleOfRadius: greenSprite.size.width/2)
                 greenSprite.physicsBody?.affectedByGravity = false
-                greenSprite.physicsBody!.dynamic = true
                 greenSprite.name = "green_\(i)"
                 
                 greenSprite.physicsBody = SKPhysicsBody(circleOfRadius: greenSprite.size.height/2)
@@ -398,7 +396,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         
         firstBody = contact.bodyA
         secondBody = contact.bodyB
-        
+//        print((firstBody!.node as! SKSpriteNode).name)
+//        print((secondBody!.node as! SKSpriteNode).name)
         
         let touched_node_temp = touched_node?.name
         let touched_node_prefix = touched_node_temp?.substringToIndex((touched_node_temp!.characters.indexOf("_"))!)
@@ -406,24 +405,74 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         let firstBody_name = (firstBody!.node as! SKSpriteNode).name
         let firstBody_name_prefix = firstBody_name?.substringToIndex(firstBody_name!.characters.indexOf("_")!)
         
-        if(touched_node_prefix == firstBody_name_prefix)
-        {
-            firstBody = contact.bodyA
-            secondBody = contact.bodyB
+        let secondBody_name = (secondBody!.node as! SKSpriteNode).name
+        let secondBody_name_prefix = secondBody_name?.substringToIndex(secondBody_name!.characters.indexOf("_")!)
+        
+        if(firstBody_name_prefix != secondBody_name_prefix){
+            if(firstBody_name_prefix == touched_node_prefix){
+                kickOffAnimation(secondBody!.node as! SKSpriteNode)
+            }else{
+                kickOffAnimation(firstBody!.node as! SKSpriteNode)
+            }
         }else{
-            firstBody = contact.bodyB
-            secondBody = contact.bodyA
-            kickOffAnimation(secondBody!.node as! SKSpriteNode)
+            if(touched_node_temp == firstBody_name)
+            {
+                firstBody = contact.bodyA
+                secondBody = contact.bodyB
+                
+            }else{
+                firstBody = contact.bodyB
+                secondBody = contact.bodyA
+            }
+            kickAnimation(secondBody!.node as! SKSpriteNode)
         }
     }
     
     func kickOffAnimation(spriteNode:SKSpriteNode){
-        var transform:CGAffineTransform = CGAffineTransformMakeTranslation(spriteNode.position.x, spriteNode.position.y);
-        let path =  CGPathCreateMutable()
-        CGPathMoveToPoint(path, &transform, 0, 0)
-        CGPathAddLineToPoint(path, &transform, 0, 75)
-        CGPathAddLineToPoint(path, &transform, 75, 75)
-        CGPathAddArc(path, &transform, 0, 75, 75, 0, CGFloat(1.5 * M_PI), false)
+//        var transform:CGAffineTransform = CGAffineTransformMakeTranslation(spriteNode.position.x, spriteNode.position.y);
+//        let path =  CGPathCreateMutable()
+//        CGPathMoveToPoint(path, &transform, 0, 0)
+//        CGPathAddLineToPoint(path, &transform, 0, 75)
+//        CGPathAddLineToPoint(path, &transform, 75, 75)
+//        CGPathAddArc(path, &transform, 0, 75, 75, 0, CGFloat(1.5 * M_PI), false)
+//        
+//        let kickoffAction = SKAction.followPath(path, asOffset: true, orientToPath: false, duration: 1)
+        
+        spriteNode.physicsBody!.dynamic = false
+        let scaleAction = SKAction.scaleTo(1, duration: 1)
+        let rotateAction = SKAction.rotateToAngle(CGFloat(3 * M_PI), duration: 1)
+         UIView.animateWithDuration(3, animations: {
+            spriteNode.alpha = 0.5
+            let actionGroup = SKAction.group([scaleAction,rotateAction])
+            spriteNode.runAction(actionGroup)
+         })
+        
+
+    }
+    
+    func kickAnimation(spriteNode:SKSpriteNode){
+        
+        var newLocation = touched_location!
+        newLocation = newLocation as CGPoint
+        
+        switch (direction_temp){
+        case UISwipeGestureRecognizerDirection.Left?:
+            newLocation.x -= mapWidth*2
+            break
+        case UISwipeGestureRecognizerDirection.Right?:
+            newLocation.x += mapWidth*2
+            break
+        case UISwipeGestureRecognizerDirection.Up?:
+            newLocation.y += mapWidth*2
+            break
+        case UISwipeGestureRecognizerDirection.Down?:
+            newLocation.y -= mapWidth*2
+            break
+        default:
+            break;
+        }
+        let moveToAction = SKAction.moveTo(newLocation, duration: 0.5)
+        spriteNode.runAction(moveToAction)
         
     }
 
