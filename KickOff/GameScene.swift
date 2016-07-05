@@ -41,7 +41,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         self.removeAllChildren()
         paintBackGround()
         displayInitSKNode()
+        test()
     }
+    
+    func test(){
+//        width_blank_space = self.view!.frame.width/8
+//        mapWidth = width_blank_space*2
+        self.physicsWorld.gravity = CGVectorMake(0,0)
+        physicsWorld.contactDelegate = self
+        let kickOffPath = UIBezierPath.init(arcCenter:CGPoint(x:mapWidth,y:0), radius: mapWidth, startAngle: CGFloat(M_PI), endAngle: CGFloat(M_PI/2), clockwise: false)
+        let followCircle = SKAction.followPath(kickOffPath.CGPath, asOffset: true, orientToPath: false, duration: 5.0)
+        let scaleToAction = SKAction.scaleTo(0.0, duration: 5.0)
+        let rotateAction = SKAction.rotateByAngle(CGFloat(5 * M_PI), duration: 5.0)
+        let spriteNode = SKSpriteNode(imageNamed: "green")
+        let kickOffActionGroup = SKAction.group([rotateAction,followCircle,scaleToAction])
+        spriteNode.position =  CGPoint(x:CGRectGetMidX(self.frame)+mapWidth/2,y:CGRectGetMidY(self.frame)+mapWidth/2)
+        spriteNode.setScale(chessScale)
+
+        self.addChild(spriteNode)
+        
+        let spriteNode2 = SKSpriteNode(imageNamed: "green")
+        spriteNode2.position =  CGPoint(x:CGRectGetMidX(self.frame)+mapWidth/2,y:CGRectGetMidY(self.frame)+3*mapWidth/2)
+        spriteNode2.setScale(chessScale)
+        self.addChild(spriteNode2)
+        spriteNode.runAction(kickOffActionGroup)
+    }
+
+
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
        /* Called when a touch begins */
         let location = (touches as NSSet).anyObject()!.locationInNode(self)
@@ -175,7 +201,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                 redSprite.physicsBody?.categoryBitMask = physicsCategoryStruct.chessCategory
                 redSprite.physicsBody?.contactTestBitMask = physicsCategoryStruct.chessCategory
                 chessArray.append(redSprite)
-                self.addChild(redSprite)
+                //self.addChild(redSprite)
             case "0":
                 let greenSprite = SKSpriteNode(imageNamed:"green")
                 greenSprite.setScale(0.6)
@@ -190,7 +216,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                 greenSprite.physicsBody?.categoryBitMask = physicsCategoryStruct.chessCategory
                 greenSprite.physicsBody?.contactTestBitMask = physicsCategoryStruct.chessCategory
                 chessArray.append(greenSprite)
-                self.addChild(greenSprite)
+                //self.addChild(greenSprite)
             default:
                 continue
             }
@@ -429,25 +455,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     }
     
     func kickOffAnimation(spriteNode:SKSpriteNode){
-//        var transform:CGAffineTransform = CGAffineTransformMakeTranslation(spriteNode.position.x, spriteNode.position.y);
-//        let path =  CGPathCreateMutable()
-//        CGPathMoveToPoint(path, &transform, 0, 0)
-//        CGPathAddLineToPoint(path, &transform, 0, 75)
-//        CGPathAddLineToPoint(path, &transform, 75, 75)
-//        CGPathAddArc(path, &transform, 0, 75, 75, 0, CGFloat(1.5 * M_PI), false)
-//        
-//        let kickoffAction = SKAction.followPath(path, asOffset: true, orientToPath: false, duration: 1)
-        
-        spriteNode.physicsBody!.dynamic = false
-        let scaleAction = SKAction.scaleTo(1, duration: 1)
-        let rotateAction = SKAction.rotateToAngle(CGFloat(3 * M_PI), duration: 1)
-         UIView.animateWithDuration(3, animations: {
-            spriteNode.alpha = 0.5
-            let actionGroup = SKAction.group([scaleAction,rotateAction])
-            spriteNode.runAction(actionGroup)
-         })
-        
 
+        switch (direction_temp){
+        case UISwipeGestureRecognizerDirection.Left?:
+            
+            break
+        case UISwipeGestureRecognizerDirection.Right?:
+            
+            break
+        case UISwipeGestureRecognizerDirection.Up?:
+            if(spriteNode.position.x > centerPoint?.x){
+                executionKickOffAnimation(spriteNode,clockWise: false,arcCenter: CGPoint(x:mapWidth,y:0),startAngel:CGFloat(M_PI),endAngle:CGFloat(2*M_PI))
+            }
+            break
+        case UISwipeGestureRecognizerDirection.Down?:
+            
+            break
+        default:
+            break;
+        }
+    }
+    
+    func executionKickOffAnimation(spriteNode:SKSpriteNode,clockWise:Bool,arcCenter:CGPoint,startAngel:CGFloat,endAngle:CGFloat){
+        
+        let kickOffPath = UIBezierPath.init(arcCenter: arcCenter, radius: mapWidth/3, startAngle: startAngel, endAngle: endAngle, clockwise: clockWise)
+        let followCircle = SKAction.followPath(kickOffPath.CGPath, asOffset: true, orientToPath: false, duration: 1.0)
+        let scaleToAction = SKAction.scaleTo(0.0, duration: 1.0)
+        let rotateAction = SKAction.rotateByAngle(CGFloat(5 * M_PI), duration: 1.0)
+
+        let kickOffActionGroup = SKAction.group([rotateAction,followCircle,scaleToAction])
+        spriteNode.runAction(kickOffActionGroup)
     }
     
     func kickAnimation(spriteNode:SKSpriteNode){
