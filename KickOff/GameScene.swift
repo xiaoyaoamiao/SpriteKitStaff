@@ -25,6 +25,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     var touched_location:CGPoint?
     var touched_node:SKNode?
     var kickOffStatus = 3
+    var moveChess = true //means red first move
     //move order
     var moveOrder:Bool = true
     
@@ -235,7 +236,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         {
             if touched_node!.name!.hasPrefix("red") || touched_node!.name!.hasPrefix("green")
             {
-                let moveOrNot = DeterminSpriteNodeAction(touched_location!,direction: sender.direction)
+                var moveOrNot = 0
+                if(touched_node!.name!.hasPrefix("red") && moveChess ){
+                    moveOrNot = DeterminSpriteNodeAction(touched_location!,direction: sender.direction)
+                }else if(touched_node!.name!.hasPrefix("green") && !moveChess ){
+                    moveOrNot = DeterminSpriteNodeAction(touched_location!,direction: sender.direction)
+                }
                 switch(moveOrNot){
                 case 0:
                     var newLocation = touched_location!
@@ -288,6 +294,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                     let scaleAction = SKAction.scaleTo(chessScale, duration: 0.5)
                     let ActionGroup = SKAction.group([moveToAction,scaleAction])
                     touched_node?.runAction(ActionGroup)
+                    moveChess = !moveChess
+                    runAction(SKAction.playSoundFileNamed("move.wav", waitForCompletion: false))
                     break;
                 case 2:
                     var newLocation = touched_location!
@@ -320,6 +328,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                     let scaleAction = SKAction.scaleTo(chessScale, duration: 0.5)
                     let ActionGroup = SKAction.group([touched_node_moveToAction,scaleAction])
                     touched_node?.runAction(ActionGroup)
+                    moveChess = !moveChess
+                    runAction(SKAction.playSoundFileNamed("move.wav", waitForCompletion: false))
                     break;
                 default:
                     break;
@@ -419,9 +429,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         
         firstBody = contact.bodyA
         secondBody = contact.bodyB
-//        print((firstBody!.node as! SKSpriteNode).name)
-//        print((secondBody!.node as! SKSpriteNode).name)
-        
+
         let touched_node_temp = touched_node?.name
         let touched_node_prefix = touched_node_temp?.substringToIndex((touched_node_temp!.characters.indexOf("_"))!)
         
@@ -456,16 +464,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         switch (direction_temp){
         case UISwipeGestureRecognizerDirection.Left?:
             if(spriteNode.position.y > centerPoint?.y){
-                executionKickOffAnimation(spriteNode,clockWise: false,arcCenter: CGPoint(x:0,y:3*mapWidth/5),startAngel:CGFloat(M_PI/2),endAngle:CGFloat(3*M_PI/2))
+                executionKickOffAnimation(spriteNode,clockWise: false,arcCenter: CGPoint(x:0,y:3*mapWidth/5),startAngel:CGFloat(-M_PI/2),endAngle:CGFloat(-M_PI*3/2))
             }else{
-                executionKickOffAnimation(spriteNode,clockWise: true,arcCenter: CGPoint(x:0,y:-3*mapWidth/5),startAngel:CGFloat(M_PI/2),endAngle:CGFloat(3*M_PI/2))
+                executionKickOffAnimation(spriteNode,clockWise: true,arcCenter: CGPoint(x:0,y:-3*mapWidth/5),startAngel:CGFloat(M_PI/2),endAngle:CGFloat(M_PI*3/2))
             }
             break
         case UISwipeGestureRecognizerDirection.Right?:
             if(spriteNode.position.y > centerPoint?.y){
-                executionKickOffAnimation(spriteNode,clockWise: true,arcCenter: CGPoint(x:0,y:3*mapWidth/5),startAngel:CGFloat(M_PI/2),endAngle:CGFloat(3*M_PI/2))
+                executionKickOffAnimation(spriteNode,clockWise: true,arcCenter: CGPoint(x:0,y:3*mapWidth/5),startAngel:CGFloat(3*M_PI/2),endAngle:CGFloat(5*M_PI/2))
             }else{
-                executionKickOffAnimation(spriteNode,clockWise: false,arcCenter: CGPoint(x:0,y:-3*mapWidth/5),startAngel:CGFloat(M_PI/2),endAngle:CGFloat(3*M_PI/2))
+                executionKickOffAnimation(spriteNode,clockWise: false,arcCenter: CGPoint(x:0,y:-3*mapWidth/5),startAngel:CGFloat(-3*M_PI/2),endAngle:CGFloat(-5*M_PI/2))
             }
             
             break
@@ -489,6 +497,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     }
     
     func executionKickOffAnimation(spriteNode:SKSpriteNode,clockWise:Bool,arcCenter:CGPoint,startAngel:CGFloat,endAngle:CGFloat){
+        runAction(SKAction.playSoundFileNamed("touch.wav", waitForCompletion: false))
+        
         let kickOffPath = UIBezierPath.init(arcCenter: arcCenter, radius: 3*mapWidth/5, startAngle: startAngel, endAngle: endAngle, clockwise: clockWise)
         let followCircle = SKAction.followPath(kickOffPath.CGPath, asOffset: true, orientToPath: false, duration: 1.0)
         let scaleToAction = SKAction.scaleTo(0.0, duration: 1.0)
@@ -500,12 +510,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
 
         let kickOffActionGroup = SKAction.group([rotateAction,followCircle,scaleToAction])
         let kickOffActionMoveAway = SKAction.removeFromParent()
+        for num in 0...chessArray.count-1{
+            if(chessArray[num].name == spriteNode.name){
+                chessArray.removeAtIndex(num)
+                break
+            }
+        }
         let kickOffActionSequence = SKAction.sequence([kickOffActionGroup,kickOffActionMoveAway])
         spriteNode.runAction(kickOffActionSequence)
+        runAction(SKAction.playSoundFileNamed("moveaway.mp3", waitForCompletion: false))
+        let wonSide = indicateWon()
+        switch(wonSide)
+        {
+        case "green":
+            let gameOverScene = GameOverScene.init(size: self.size, wonSide: "green")
+            self.view?.presentScene(gameOverScene)
+            break;
+        case "red":
+            let gameOverScene = GameOverScene.init(size: self.size, wonSide: "red")
+            self.view?.presentScene(gameOverScene)
+            break;
+        default:
+            break;
+        }
     }
     
     func kickAnimation(spriteNode:SKSpriteNode){
-        
+        runAction(SKAction.playSoundFileNamed("touch.wav", waitForCompletion: false))
         var newLocation = touched_location!
         newLocation = newLocation as CGPoint
         
@@ -527,7 +558,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         }
         let moveToAction = SKAction.moveTo(newLocation, duration: 0.5)
         spriteNode.runAction(moveToAction)
-        
+        runAction(SKAction.playSoundFileNamed("move.wav", waitForCompletion: false))
+    }
+    
+    func indicateWon()->String{
+        var redChess = 0
+        var greenChess = 0
+        for chess in chessArray{
+            let name = chess.name
+            if name!.hasPrefix("red")
+            {
+                redChess++
+            }else{
+                greenChess++
+            }
+                       }
+        if redChess == 1{
+            return "red"
+        }
+        else if greenChess == 1{
+           return "green"
+        }
+        else{
+           return "none"
+        }
     }
 
 
