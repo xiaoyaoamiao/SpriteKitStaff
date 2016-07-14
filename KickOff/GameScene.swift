@@ -9,6 +9,7 @@
 import SpriteKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate{
+    
     var width_blank_space:CGFloat = 0.0
     var mapWidth:CGFloat = 0
     var mapHeight:CGFloat = 0
@@ -28,22 +29,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     var moveChess = true //means red first move
     //move order
     var moveOrder:Bool = true
-    
+    //betterfly
+    var betterFly_2:SKSpriteNode?
+    let betterFly_2_texture = SKTextureAtlas(named: "butterfly2.atlas")
+    var betterFly_1:SKSpriteNode?
+    let betterFly_1_texture = SKTextureAtlas(named: "butterfly1.atlas")
     //Phycics
     var SKPhysicsJointLimitTest:SKPhysicsJointLimit?
-    
     
     struct physicsCategoryStruct {
         static let chessCategory:UInt32 = 0b1 //1
     }
-    
-    
+
     override func didMoveToView(view: SKView) {
         centerPoint = CGPoint(x:CGRectGetMidX(self.frame),y:CGRectGetMidY(self.frame))
         self.removeAllChildren()
         paintBackGround()
         displayInitSKNode()
         //test()
+        //Add butterFly
+        betterFly_1 = SKSpriteNode(texture: betterFly_2_texture.textureNamed("bf0101.jpg"))
+        betterFly_1!.position = CGPointMake(self.size.width/2+mapHeight/2, self.size.height/2-mapHeight) //CGPoint(x: betterFly_1!.size.width/2, y: CGRectGetMidY(self.frame)-mapHeight/2)
+         
+        runBetterFly()
+        self.addChild(betterFly_1!)
     }
     
     func test(){
@@ -112,7 +121,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         bg.setScale(1.5)
         bg.size = CGSize(width: self.size.width/2, height: self.size.height/2)
         bg.name = "backGround"
-        self.addChild(bg)
+       // self.addChild(bg)
     }
     
     func displayInitSKNode(){
@@ -583,9 +592,40 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
            return "none"
         }
     }
-
-
-}
+    
+    func runBetterFly(){
+         let betterFlyRun = SKAction.animateWithTextures([
+                betterFly_1_texture.textureNamed("bf0101.jpg"),
+                betterFly_1_texture.textureNamed("bf0102.jpg"),
+                betterFly_1_texture.textureNamed("bf0103.jpg"),
+                betterFly_1_texture.textureNamed("bf0104.jpg"),
+                betterFly_1_texture.textureNamed("bf0105.jpg"),
+                betterFly_1_texture.textureNamed("bf0106.jpg"),
+                betterFly_1_texture.textureNamed("bf0107.jpg"),
+                betterFly_1_texture.textureNamed("bf0108.jpg"),
+                betterFly_1_texture.textureNamed("bf0109.jpg"),
+                betterFly_1_texture.textureNamed("bf0110.jpg"),
+                betterFly_1_texture.textureNamed("bf0111.jpg"),
+                betterFly_1_texture.textureNamed("bf0112.jpg"),
+                betterFly_1_texture.textureNamed("bf0113.jpg"),
+                betterFly_1_texture.textureNamed("bf0114.jpg"),
+                betterFly_1_texture.textureNamed("bf0115.jpg"),
+                betterFly_1_texture.textureNamed("bf0116.jpg"),
+                betterFly_1_texture.textureNamed("bf0117.jpg"),
+                betterFly_1_texture.textureNamed("bf0118.jpg"),
+                betterFly_1_texture.textureNamed("bf0119.jpg"),
+                betterFly_1_texture.textureNamed("bf0120.jpg"),
+                betterFly_1_texture.textureNamed("bf0121.jpg"),
+                betterFly_1_texture.textureNamed("bf0122.jpg"),
+                betterFly_1_texture.textureNamed("bf0123.jpg"),
+                betterFly_1_texture.textureNamed("bf0124.jpg"),
+                betterFly_1_texture.textureNamed("bf0125.jpg"),
+                betterFly_1_texture.textureNamed("bf0126.jpg")
+                ], timePerFrame: 0.1)
+            let runAction = SKAction.repeatActionForever(betterFlyRun)
+            betterFly_1!.runAction(runAction)
+    }
+ }
 
 
 
