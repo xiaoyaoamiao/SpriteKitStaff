@@ -20,20 +20,21 @@ class GameScene: SKScene {
         let borderBody = SKPhysicsBody.init(edgeLoopFromRect: self.frame)
         self.physicsBody = borderBody
         self.physicsBody?.friction = 0.0
+         self.physicsWorld.gravity = CGVectorMake(0, -1)
         
         ball.physicsBody = SKPhysicsBody.init(rectangleOfSize: ball.size)
         //ball.physicsBody!.friction = 0.2
         ball.physicsBody!.restitution = 0.8
         ball.physicsBody!.linearDamping = 0.0
         ball.physicsBody!.allowsRotation = false
-        
         ball.physicsBody?.mass = 1000
+        ball.physicsBody?.density = 10
         
         let thrust:Float = 0.12
         
-        let shipDirection:Float = 0
+        let shipDirection:Float = 10
         //let thrustVector = CGPointMake((CGFloat)(thrust*cosf(shipDirection)),(CGFloat)(thrust*sinf(shipDirection)));
-        ball.physicsBody?.applyForce(CGVectorMake((CGFloat)(thrust*cosf(shipDirection)),(CGFloat)(thrust*sinf(shipDirection))))
+        ball.physicsBody?.applyForce(CGVectorMake((CGFloat)(-thrust*cosf(shipDirection)),(CGFloat)(thrust*sinf(shipDirection))))
         
     }
     
