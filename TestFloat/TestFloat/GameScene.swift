@@ -21,26 +21,30 @@ class GameScene: SKScene {
     let Force_Vector_distance:Float = 30
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
-        
+        //let fieldCenter = self.childNodeWithName("SKSpriteNode_0")?.position
         self.physicsBody = SKPhysicsBody.init(edgeLoopFromRect: CGRectMake(self.frame.origin.x+290, self.frame.origin.y, self.frame.size.height-320, self.frame.size.width-100))
         print(self.frame.size.width)
         print(self.frame.size.height)
         self.physicsBody?.friction = 0.0
         self.physicsWorld.gravity = CGVectorMake(0, -1)
+        let radialGravityField = self.childNodeWithName("SKVortexFieldNode_0")
+        radialGravityField!.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
 
-
-        for _ in 1...10{
+        //addChild(radialGravityField)
+        
+        
+        for _ in 1...100{
             let ball = SKSpriteNode.init(imageNamed: "ball.png")
             ball.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
             ball.setScale(1)
             ball.physicsBody = SKPhysicsBody.init(rectangleOfSize: ball.size)
-            //ball.physicsBody!.friction = 0.2
-            ball.physicsBody!.restitution = 0.8
+            ball.physicsBody!.friction = 0.1
+            ball.physicsBody!.restitution = 0.6
             ball.physicsBody!.linearDamping = 0.0
             ball.physicsBody!.allowsRotation = false
             ball.physicsBody?.mass = 1000
             ball.physicsBody?.density = 10
-            
+            ball.setScale(0.4)
             
             ball.name = "test"
             self.addChild(ball)
