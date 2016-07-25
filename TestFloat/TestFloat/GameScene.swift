@@ -26,29 +26,43 @@ class GameScene: SKScene {
         print(self.frame.size.width)
         print(self.frame.size.height)
         self.physicsBody?.friction = 0.0
-        self.physicsWorld.gravity = CGVectorMake(0, -1)
+        self.physicsWorld.gravity = CGVectorMake(0, -0.1)
         let radialGravityField = self.childNodeWithName("SKVortexFieldNode_0")
-        radialGravityField!.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
+        let spaceShip = self.childNodeWithName("SKSpriteNode_0")
+        radialGravityField!.position = (spaceShip?.position)!//CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
 
         //addChild(radialGravityField)
+        paintBackGround()
         
-        
-        for _ in 1...100{
+        for _ in 1...50{
             let ball = SKSpriteNode.init(imageNamed: "ball.png")
             ball.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
             ball.setScale(1)
             ball.physicsBody = SKPhysicsBody.init(rectangleOfSize: ball.size)
-            ball.physicsBody!.friction = 0.1
+            ball.physicsBody!.friction = 1
             ball.physicsBody!.restitution = 0.6
             ball.physicsBody!.linearDamping = 0.0
-            ball.physicsBody!.allowsRotation = false
+            ball.physicsBody!.allowsRotation = true
             ball.physicsBody?.mass = 1000
-            ball.physicsBody?.density = 10
+            ball.physicsBody?.density = 30
             ball.setScale(0.4)
             
             ball.name = "test"
             self.addChild(ball)
+
         }
+        
+    }
+    
+    func paintBackGround(){
+        let bg = SKSpriteNode.init(imageNamed:"background.png")
+        bg.position =  CGPointMake(self.size.width/2, self.size.height/2)
+        bg.name = "backImage"
+        bg.alpha = 0.8
+        bg.setScale(1.5)
+        bg.size = CGSize(width: self.size.width, height: self.size.height)
+        bg.name = "backGround"
+        self.addChild(bg)
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
