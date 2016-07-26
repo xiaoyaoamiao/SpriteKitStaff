@@ -23,7 +23,7 @@ class GameScene: SKScene {
         /* Setup your scene here */
         //let fieldCenter = self.childNodeWithName("SKSpriteNode_0")?.position
         self.physicsBody = SKPhysicsBody.init(edgeLoopFromRect: CGRectMake(self.frame.origin.x+295, self.frame.origin.y, self.frame.size.height-330, self.frame.size.width-250))
-                //self.physicsBody = SKPhysicsBody.init(edgeLoopFromRect: CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width,self.frame.size.height ))
+        //self.physicsBody = SKPhysicsBody.init(edgeLoopFromRect: CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width,self.frame.size.height ))
         print(self.frame.size.width)
         print(self.frame.size.height)
         self.physicsBody?.friction = 0.0
@@ -52,8 +52,10 @@ class GameScene: SKScene {
         //Button
         let leftButton = self.childNodeWithName("buttonLeft")
         let rightButton = self.childNodeWithName("buttonRight")
-        (leftButton as SKSpriteNode).physicsBody = SKPhysicsBody.init(rectangleOfSize:(leftButton as SKSpriteNode).size)
-        (rightButton as SKSpriteNode).physicsBody = SKPhysicsBody.init(rectangleOfSize:(rightButton as SKSpriteNode).size)
+//        (leftButton as SKSpriteNode).physicsBody = SKPhysicsBody.init(rectangleOfSize:(leftButton as SKSpriteNode).size)
+//        (rightButton as SKSpriteNode).physicsBody = SKPhysicsBody.init(rectangleOfSize:(rightButton as SKSpriteNode).size)
+        leftButton!.physicsBody = SKPhysicsBody.init(rectangleOfSize:(leftButton as! SKSpriteNode).size)
+        rightButton!.physicsBody = SKPhysicsBody.init(rectangleOfSize:(rightButton as! SKSpriteNode).size)
         leftButton?.physicsBody?.affectedByGravity = false
         rightButton?.physicsBody?.affectedByGravity = false
         leftButton?.physicsBody?.friction = 0
@@ -72,25 +74,19 @@ class GameScene: SKScene {
         bg.name = "backGround"
         self.addChild(bg)
     }
-    
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
-//        ball.physicsBody?.applyForce(MAX_CGVector_NE)
-        
+
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         for touch in touches {
-            //print(touch.locationInNode(self))
-            let force = force_left(nodeVector(MAX_CGVector_NE, nodeLocation: touch.locationInNode(self)),nodeLocation: touch.locationInNode(self))
-            //print(force)
-            //print(force_right(nodeVector(MAX_CGVector_NW, nodeLocation: touch.locationInNode(self)),nodeLocation: touch.locationInNode(self)))
-            //print(self.frame.size.width)
-            //print(touch.locationInNode(self).x)
             for node in self.children{
                 if node.name == "test"{
                     if (touch.locationInNode(self).x > self.frame.size.width/2){
-                        (node as SKSpriteNode).physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+//                        (node as SKSpriteNode).physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                        node.physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                     }
                     else
                     {
-                        (node as SKSpriteNode).physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+//                        (node as SKSpriteNode).physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                        node.physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                     }
                 }
                 
