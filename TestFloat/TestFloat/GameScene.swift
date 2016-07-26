@@ -33,20 +33,47 @@ class GameScene: SKScene {
 
         //addChild(radialGravityField)
         paintBackGround()
-        for _ in 1...50{
-            let ball = SKSpriteNode.init(imageNamed: "ball.png")
-            ball.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
-            ball.setScale(1)
-            ball.physicsBody = SKPhysicsBody.init(rectangleOfSize: ball.size)
-            ball.physicsBody!.friction = 1
-            ball.physicsBody!.restitution = 0.6
-            ball.physicsBody!.linearDamping = 0.0
-            ball.physicsBody!.allowsRotation = true
-            ball.physicsBody?.mass = 1000
-            ball.physicsBody?.density = 30
-            ball.setScale(0.4)
-            ball.name = "test"
-            self.addChild(ball)
+        
+        //add tadpole
+
+        let tadpole1 = SKTexture(imageNamed: "tadpole1.png")
+        let tadpole2 = SKTexture(imageNamed: "tadpole2.png")
+        let tadpole3 = SKTexture(imageNamed: "tadpole3.png")
+        let tadpole4 = SKTexture(imageNamed: "tadpole4.png")
+        var tadpoleArray = [tadpole1,tadpole2,tadpole3,tadpole4]
+        
+        for _ in 1...20{
+//            let ball = SKSpriteNode.init(imageNamed: "ball.png")
+//            ball.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
+//            ball.setScale(1)
+//            ball.physicsBody = SKPhysicsBody.init(rectangleOfSize: ball.size)
+//            ball.physicsBody!.friction = 1
+//            ball.physicsBody!.restitution = 0.6
+//            ball.physicsBody!.linearDamping = 0.0
+//            ball.physicsBody!.allowsRotation = true
+//            ball.physicsBody?.mass = 1000
+//            ball.physicsBody?.density = 30
+//            ball.setScale(0.4)
+//            ball.name = "test"
+//            self.addChild(ball)
+
+            var tadpole = SKSpriteNode(texture: tadpole1)
+            
+            tadpole.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
+            tadpole.setScale(1)
+            tadpole.physicsBody = SKPhysicsBody(circleOfRadius: tadpole.size.width/2)
+            tadpole.physicsBody!.friction = 1
+            tadpole.physicsBody!.restitution = 0.6
+            tadpole.physicsBody!.linearDamping = 0.0
+            tadpole.physicsBody!.allowsRotation = true
+            tadpole.physicsBody?.mass = 10
+            tadpole.physicsBody?.density = 10
+            tadpole.setScale(0.4)
+            tadpole.name = "tadpole"
+            self.addChild(tadpole)
+            var tadpoleMove = SKAction.animateWithTextures(tadpoleArray, timePerFrame: 0.1)
+            var runTadpole = SKAction.repeatActionForever(tadpoleMove)
+            tadpole.runAction(runTadpole)
         }
         
         //Button
@@ -54,8 +81,8 @@ class GameScene: SKScene {
         let rightButton = self.childNodeWithName("buttonRight")
 //        (leftButton as SKSpriteNode).physicsBody = SKPhysicsBody.init(rectangleOfSize:(leftButton as SKSpriteNode).size)
 //        (rightButton as SKSpriteNode).physicsBody = SKPhysicsBody.init(rectangleOfSize:(rightButton as SKSpriteNode).size)
-        leftButton!.physicsBody = SKPhysicsBody.init(rectangleOfSize:(leftButton as! SKSpriteNode).size)
-        rightButton!.physicsBody = SKPhysicsBody.init(rectangleOfSize:(rightButton as! SKSpriteNode).size)
+        leftButton!.physicsBody = SKPhysicsBody(circleOfRadius:(leftButton as SKSpriteNode).size.width/2-5)
+        rightButton!.physicsBody = SKPhysicsBody(circleOfRadius:(rightButton as SKSpriteNode).size.width/2-5)
         leftButton?.physicsBody?.affectedByGravity = false
         rightButton?.physicsBody?.affectedByGravity = false
         leftButton?.physicsBody?.friction = 0
@@ -75,25 +102,65 @@ class GameScene: SKScene {
         self.addChild(bg)
     }
 
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesBegan(touches: NSSet, withEvent event: UIEvent?) {
         for touch in touches {
-            for node in self.children{
-                if node.name == "test"{
-                    if (touch.locationInNode(self).x > self.frame.size.width/2){
-//                        (node as SKSpriteNode).physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
-                        node.physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
-                    }
-                    else
-                    {
-//                        (node as SKSpriteNode).physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
-                        node.physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+            let clickNode = nodeAtPoint((touches as NSSet).anyObject()!.locationInNode(self))
+            if clickNode.name != nil{
+                if clickNode.name!.hasPrefix("button")
+                {
+                    changeButtonColor(clickNode as SKSpriteNode)
+                    for node in self.children{
+                        if node.name == "tadpole"{
+                            if (touch.locationInNode(self).x > self.frame.size.width/2){
+                                (node as SKSpriteNode).physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                //   node.physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                            }
+                            else
+                            {
+                                (node as SKSpriteNode).physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                //node.physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                            }
+                        }
                     }
                 }
-                
+            }
+            
+            
+        }
+    }
+    override func touchesEnded(touches: NSSet, withEvent event: UIEvent) {
+        changeButtonColorBack(touches)
+    }
+    
+    override func touchesCancelled(touches: NSSet!, withEvent event: UIEvent!) {
+        changeButtonColorBack(touches)
+    }
+    
+    override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
+        changeButtonColorBack(touches)
+    }
+    
+    func changeButtonColor(button:SKSpriteNode){
+        let changeColor = SKAction.colorizeWithColor(SKColor.greenColor(), colorBlendFactor: 5, duration: 0.1)
+        button.runAction(changeColor)
+    }
+    
+    func changeButtonColorBack(touches: NSSet){
+        let leftButton = self.childNodeWithName("buttonLeft")
+        let rightButton = self.childNodeWithName("buttonRight")
+        
+        let clickNode = nodeAtPoint((touches as NSSet).anyObject()!.locationInNode(self))
+        println(clickNode.name)
+        if clickNode.name != nil{
+            if clickNode.name == "buttonLeft"{
+                let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.3)
+                (leftButton as SKSpriteNode).runAction(changeColorBack)
+            }else if clickNode.name == "buttonRight"{
+                let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.3)
+                (rightButton as SKSpriteNode).runAction(changeColorBack)
             }
         }
     }
-    
    
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
@@ -113,7 +180,7 @@ class GameScene: SKScene {
     }
     func force_right(vector:CGVector,nodeLocation:CGPoint)->CGVector{
         let tempPowerDownRate = pow((CGFloat)(Force_down_rate), sqrt(pow(nodeLocation.x-ForceButton_right.x, 2.0)+pow(nodeLocation.y-ForceButton_left.y, 2.0))/(CGFloat)(Force_Vector_distance))
-        print(tempPowerDownRate)
+        //print(tempPowerDownRate)
         return CGVectorMake(-tempPowerDownRate*vector.dx, tempPowerDownRate*vector.dy)
     }
 }
