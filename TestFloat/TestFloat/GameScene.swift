@@ -81,8 +81,8 @@ class GameScene: SKScene {
         let rightButton = self.childNodeWithName("buttonRight")
 //        (leftButton as SKSpriteNode).physicsBody = SKPhysicsBody.init(rectangleOfSize:(leftButton as SKSpriteNode).size)
 //        (rightButton as SKSpriteNode).physicsBody = SKPhysicsBody.init(rectangleOfSize:(rightButton as SKSpriteNode).size)
-        leftButton!.physicsBody = SKPhysicsBody(circleOfRadius:(leftButton as SKSpriteNode).size.width/2-5)
-        rightButton!.physicsBody = SKPhysicsBody(circleOfRadius:(rightButton as SKSpriteNode).size.width/2-5)
+        leftButton!.physicsBody = SKPhysicsBody(circleOfRadius:(leftButton as! SKSpriteNode).size.width/2-5)
+        rightButton!.physicsBody = SKPhysicsBody(circleOfRadius:(rightButton as! SKSpriteNode).size.width/2-5)
         leftButton?.physicsBody?.affectedByGravity = false
         rightButton?.physicsBody?.affectedByGravity = false
         leftButton?.physicsBody?.friction = 0
@@ -101,23 +101,24 @@ class GameScene: SKScene {
         bg.name = "backGround"
         self.addChild(bg)
     }
+    
 
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent?) {
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         for touch in touches {
             let clickNode = nodeAtPoint((touches as NSSet).anyObject()!.locationInNode(self))
             if clickNode.name != nil{
                 if clickNode.name!.hasPrefix("button")
                 {
-                    changeButtonColor(clickNode as SKSpriteNode)
+                    changeButtonColor(clickNode as! SKSpriteNode)
                     for node in self.children{
                         if node.name == "tadpole"{
                             if (touch.locationInNode(self).x > self.frame.size.width/2){
-                                (node as SKSpriteNode).physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                (node as! SKSpriteNode).physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                                 //   node.physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                             }
                             else
                             {
-                                (node as SKSpriteNode).physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                (node as! SKSpriteNode).physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                                 //node.physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                             }
                         }
@@ -128,15 +129,15 @@ class GameScene: SKScene {
             
         }
     }
-    override func touchesEnded(touches: NSSet, withEvent event: UIEvent) {
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent!) {
         changeButtonColorBack(touches)
     }
     
-    override func touchesCancelled(touches: NSSet!, withEvent event: UIEvent!) {
+    override func touchesCancelled(touches: Set<UITouch>!, withEvent event: UIEvent!) {
         changeButtonColorBack(touches)
     }
     
-    override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent!) {
         changeButtonColorBack(touches)
     }
     
@@ -150,14 +151,14 @@ class GameScene: SKScene {
         let rightButton = self.childNodeWithName("buttonRight")
         
         let clickNode = nodeAtPoint((touches as NSSet).anyObject()!.locationInNode(self))
-        println(clickNode.name)
+        print(clickNode.name)
         if clickNode.name != nil{
             if clickNode.name == "buttonLeft"{
                 let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.3)
-                (leftButton as SKSpriteNode).runAction(changeColorBack)
+                (leftButton as! SKSpriteNode).runAction(changeColorBack)
             }else if clickNode.name == "buttonRight"{
                 let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.3)
-                (rightButton as SKSpriteNode).runAction(changeColorBack)
+                (rightButton as! SKSpriteNode).runAction(changeColorBack)
             }
         }
     }
