@@ -68,10 +68,10 @@ class GameScene: SKScene {
             tadpole.physicsBody!.allowsRotation = true
             tadpole.physicsBody?.mass = 10
             tadpole.physicsBody?.density = 10
-            tadpole.setScale(0.4)
+            tadpole.setScale(0.2)
             tadpole.name = "tadpole"
             self.addChild(tadpole)
-            var tadpoleMove = SKAction.animateWithTextures(tadpoleArray, timePerFrame: 0.1)
+            var tadpoleMove = SKAction.animateWithTextures(tadpoleArray, timePerFrame: 0.05)
             var runTadpole = SKAction.repeatActionForever(tadpoleMove)
             tadpole.runAction(runTadpole)
         }
@@ -89,6 +89,8 @@ class GameScene: SKScene {
         rightButton?.physicsBody?.friction = 0
         rightButton?.physicsBody?.dynamic = false
         leftButton?.physicsBody?.dynamic = false
+        
+        paintMomAndBottle()
     }
     
     func paintBackGround(){
@@ -101,10 +103,71 @@ class GameScene: SKScene {
         bg.name = "backGround"
         self.addChild(bg)
     }
+    
+    func paintMomAndBottle(){
+        //add mom
+        let momTexture = SKTexture(imageNamed: "mom1.png")
+        var momTextureArray:[SKTexture] = [momTexture]
+        for i in 2...30{
+            let temp = (String)(i)
+            momTextureArray.append(SKTexture(imageNamed: "mom"+(String)(i)+".png"))
+        }
+
+        var mom = SKSpriteNode(texture: momTexture)
+        mom.name = "mom"
+        mom.position = CGPoint(x:self.frame.origin.x+300+mom.size.width/2+(CGFloat)(arc4random()%UInt32(self.frame.size.height-330-mom.size.width)), y:CGRectGetMidY(self.frame)-100+(CGFloat)(arc4random()%300))
+        print(mom.position)
+        println("x:\(self.frame.origin.x+mom.size.width/2) width\(self.frame.size.height)")
+        self.addChild(mom)
+        var momChangeTexsure = SKAction.animateWithTextures(momTextureArray, timePerFrame: 0.1)
+        var runMom = SKAction.repeatActionForever(momChangeTexsure)
+        mom.setScale(0.6)
+        mom.runAction(runMom)
+        //add bottle
+        let bottle = SKSpriteNode.init(imageNamed:"bottle.png")
+        bottle.position = CGPointMake(mom.position.x,mom.position.y+mom.size.height/3)
+        bottle.setScale(1)
+        bottle.name = "bottle"
+        //add physices for bottle
+        var bottlePath = CGPathCreateMutable()
+        var bottleDoorWidthLeftSpace = bottle.size.width/5
+        var bottleDoorWidthRightSpace = bottle.size.width/7
+        var bottleHeightSestion1 = bottle.size.height*1/5
+        var bottleHeightSestion2 = bottle.size.height*2/5
+        var bottleGlassThick:CGFloat = 2
+        CGPathMoveToPoint(bottlePath, nil, -bottle.size.width/2+bottleDoorWidthLeftSpace, bottle.size.height/2) //1
+        CGPathAddLineToPoint(bottlePath, nil, -bottle.size.width/2+bottleDoorWidthLeftSpace, bottle.size.height/2-bottleHeightSestion1)//2
+        CGPathAddLineToPoint(bottlePath, nil, -bottle.size.width/2, bottle.size.height/2-bottleHeightSestion1-bottleHeightSestion2)//3
+        CGPathAddLineToPoint(bottlePath, nil, -bottle.size.width/2, -bottle.size.height/2)//4
+        CGPathAddLineToPoint(bottlePath, nil, bottle.size.width/2, -bottle.size.height/2)//5
+        
+        CGPathAddLineToPoint(bottlePath, nil, bottle.size.width/2, bottle.size.height/2-bottleHeightSestion1-bottleHeightSestion2)//6
+        CGPathAddLineToPoint(bottlePath, nil, bottle.size.width/2-bottleDoorWidthRightSpace, bottle.size.height/2-bottleHeightSestion1)//7
+        CGPathAddLineToPoint(bottlePath, nil, bottle.size.width/2-bottleDoorWidthRightSpace, bottle.size.height/2)//8
+        
+        
+        CGPathAddLineToPoint(bottlePath, nil, bottle.size.width/2-bottleDoorWidthRightSpace-bottleGlassThick, bottle.size.height/2) //8-1
+        CGPathAddLineToPoint(bottlePath, nil, bottle.size.width/2-bottleDoorWidthRightSpace-bottleGlassThick, bottle.size.height/2-bottleHeightSestion1)//7-1
+        CGPathAddLineToPoint(bottlePath, nil, bottle.size.width/2-bottleGlassThick, bottle.size.height/2-bottleHeightSestion1-bottleHeightSestion2)//6-1
+        CGPathAddLineToPoint(bottlePath, nil, bottle.size.width/2-bottleGlassThick, -bottle.size.height/2+bottleGlassThick)//5-1
+        CGPathAddLineToPoint(bottlePath, nil, -bottle.size.width/2+bottleGlassThick, -bottle.size.height/2+bottleGlassThick)//4-1
+        CGPathAddLineToPoint(bottlePath, nil, -bottle.size.width/2+bottleGlassThick, bottle.size.height/2-bottleHeightSestion1-bottleHeightSestion2)//3-1
+        CGPathAddLineToPoint(bottlePath, nil, -bottle.size.width/2+bottleDoorWidthLeftSpace+bottleGlassThick, bottle.size.height/2-bottleHeightSestion1)//2-1
+        CGPathAddLineToPoint(bottlePath, nil, -bottle.size.width/2+bottleDoorWidthLeftSpace+bottleGlassThick, bottle.size.height/2) //1-1
+        CGPathAddLineToPoint(bottlePath, nil, -bottle.size.width/2+bottleDoorWidthLeftSpace, bottle.size.height/2) //1-0
+        
+        bottle.physicsBody = SKPhysicsBody(polygonFromPath: bottlePath)
+        bottle.physicsBody?.affectedByGravity = false
+        bottle.physicsBody?.friction = 0
+        bottle.physicsBody?.dynamic = false
+        println(bottle.size)
+        self.addChild(bottle)
+    }
 
     override func touchesBegan(touches: NSSet, withEvent event: UIEvent?) {
         for touch in touches {
             let clickNode = nodeAtPoint((touches as NSSet).anyObject()!.locationInNode(self))
+            println((touches as NSSet).anyObject()!.locationInNode(self))
             if clickNode.name != nil{
                 if clickNode.name!.hasPrefix("button")
                 {
