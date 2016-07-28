@@ -19,6 +19,8 @@ class GameScene: SKScene {
     let ForceButton_right = CGPoint(x: 680, y: 50)
     let Force_down_rate:Float = 0.9
     let Force_Vector_distance:Float = 30
+    let bottleGlassThick:CGFloat = 2
+
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
         //let fieldCenter = self.childNodeWithName("SKSpriteNode_0")?.position
@@ -134,7 +136,7 @@ class GameScene: SKScene {
         var bottleDoorWidthRightSpace = bottle.size.width/7
         var bottleHeightSestion1 = bottle.size.height*1/5
         var bottleHeightSestion2 = bottle.size.height*2/5
-        var bottleGlassThick:CGFloat = 2
+        
         CGPathMoveToPoint(bottlePath, nil, -bottle.size.width/2+bottleDoorWidthLeftSpace, bottle.size.height/2) //1
         CGPathAddLineToPoint(bottlePath, nil, -bottle.size.width/2+bottleDoorWidthLeftSpace, bottle.size.height/2-bottleHeightSestion1)//2
         CGPathAddLineToPoint(bottlePath, nil, -bottle.size.width/2, bottle.size.height/2-bottleHeightSestion1-bottleHeightSestion2)//3
@@ -174,9 +176,13 @@ class GameScene: SKScene {
                     changeButtonColor(clickNode as SKSpriteNode)
                     for node in self.children{
                         if node.name == "tadpole"{
+                            let bottle = self.childNodeWithName("bottle")
+                                if (node.position.x > (bottle.position.x-bottle.postion.width/2))&&(node.position.x < (bottle.position.x+bottle.postion.width/2)) && (node.postion.y > (bottle.position.y-bottle.position.height/2))&&(node.postion.y < (bottle.position.y+bottle.position.height/2)){
+                                    continue
+                                }
                             if (touch.locationInNode(self).x > self.frame.size.width/2){
                                 (node as SKSpriteNode).physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
-                                //   node.physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                  // node.physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                             }
                             else
                             {
@@ -195,7 +201,7 @@ class GameScene: SKScene {
         changeButtonColorBack(touches)
     }
     
-    override func touchesCancelled(touches: NSSet!, withEvent event: UIEvent!) {
+    override func touchesCancelled(touches: NSSet, withEvent event: UIEvent!) {
         changeButtonColorBack(touches)
     }
     
@@ -213,7 +219,7 @@ class GameScene: SKScene {
         let rightButton = self.childNodeWithName("buttonRight")
         
         let clickNode = nodeAtPoint((touches as NSSet).anyObject()!.locationInNode(self))
-        println(clickNode.name)
+        print(clickNode.name)
         if clickNode.name != nil{
             if clickNode.name == "buttonLeft"{
                 let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.3)
