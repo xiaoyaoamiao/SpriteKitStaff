@@ -24,6 +24,24 @@ class GameScene: SKScene {
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
         //let fieldCenter = self.childNodeWithName("SKSpriteNode_0")?.position
+        paintBackGround()
+        paintMomAndBottle()
+        
+        //Button
+        let leftButton = self.childNodeWithName("buttonLeft")
+        let rightButton = self.childNodeWithName("buttonRight")
+        //        (leftButton as SKSpriteNode).physicsBody = SKPhysicsBody.init(rectangleOfSize:(leftButton as SKSpriteNode).size)
+        //        (rightButton as SKSpriteNode).physicsBody = SKPhysicsBody.init(rectangleOfSize:(rightButton as SKSpriteNode).size)
+        leftButton!.physicsBody = SKPhysicsBody(circleOfRadius:(leftButton as! SKSpriteNode).size.width/2-5)
+        rightButton!.physicsBody = SKPhysicsBody(circleOfRadius:(rightButton as! SKSpriteNode).size.width/2-5)
+        leftButton?.physicsBody?.affectedByGravity = false
+        rightButton?.physicsBody?.affectedByGravity = false
+        leftButton?.physicsBody?.friction = 0
+        rightButton?.physicsBody?.friction = 0
+        rightButton?.physicsBody?.dynamic = false
+        leftButton?.physicsBody?.dynamic = false
+        
+        
         self.physicsBody = SKPhysicsBody.init(edgeLoopFromRect: CGRectMake(self.frame.origin.x+295, self.frame.origin.y, self.frame.size.height-330, self.frame.size.width-250))
         //self.physicsBody = SKPhysicsBody.init(edgeLoopFromRect: CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width,self.frame.size.height ))
         print(self.frame.size.width)
@@ -33,33 +51,17 @@ class GameScene: SKScene {
         let radialGravityField = self.childNodeWithName("SKVortexFieldNode_0")
         radialGravityField!.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
 
-        //addChild(radialGravityField)
-        paintBackGround()
-        
         //add tadpole
 
         let tadpole1 = SKTexture(imageNamed: "tadpole1.png")
         let tadpole2 = SKTexture(imageNamed: "tadpole2.png")
         let tadpole3 = SKTexture(imageNamed: "tadpole3.png")
         let tadpole4 = SKTexture(imageNamed: "tadpole4.png")
-        var tadpoleArray = [tadpole1,tadpole2,tadpole3,tadpole4]
+        let tadpoleArray = [tadpole1,tadpole2,tadpole3,tadpole4]
         
         for _ in 1...20{
-//            let ball = SKSpriteNode.init(imageNamed: "ball.png")
-//            ball.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
-//            ball.setScale(1)
-//            ball.physicsBody = SKPhysicsBody.init(rectangleOfSize: ball.size)
-//            ball.physicsBody!.friction = 1
-//            ball.physicsBody!.restitution = 0.6
-//            ball.physicsBody!.linearDamping = 0.0
-//            ball.physicsBody!.allowsRotation = true
-//            ball.physicsBody?.mass = 1000
-//            ball.physicsBody?.density = 30
-//            ball.setScale(0.4)
-//            ball.name = "test"
-//            self.addChild(ball)
 
-            var tadpole = SKSpriteNode(texture: tadpole1)
+            let tadpole = SKSpriteNode(texture: tadpole1)
             
             tadpole.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
             tadpole.setScale(1)
@@ -73,26 +75,13 @@ class GameScene: SKScene {
             tadpole.setScale(0.2)
             tadpole.name = "tadpole"
             self.addChild(tadpole)
-            var tadpoleMove = SKAction.animateWithTextures(tadpoleArray, timePerFrame: 0.05)
-            var runTadpole = SKAction.repeatActionForever(tadpoleMove)
+            let tadpoleMove = SKAction.animateWithTextures(tadpoleArray, timePerFrame: 0.05)
+            let runTadpole = SKAction.repeatActionForever(tadpoleMove)
             tadpole.runAction(runTadpole)
         }
         
-        //Button
-        let leftButton = self.childNodeWithName("buttonLeft")
-        let rightButton = self.childNodeWithName("buttonRight")
-//        (leftButton as SKSpriteNode).physicsBody = SKPhysicsBody.init(rectangleOfSize:(leftButton as SKSpriteNode).size)
-//        (rightButton as SKSpriteNode).physicsBody = SKPhysicsBody.init(rectangleOfSize:(rightButton as SKSpriteNode).size)
-        leftButton!.physicsBody = SKPhysicsBody(circleOfRadius:(leftButton as SKSpriteNode).size.width/2-5)
-        rightButton!.physicsBody = SKPhysicsBody(circleOfRadius:(rightButton as SKSpriteNode).size.width/2-5)
-        leftButton?.physicsBody?.affectedByGravity = false
-        rightButton?.physicsBody?.affectedByGravity = false
-        leftButton?.physicsBody?.friction = 0
-        rightButton?.physicsBody?.friction = 0
-        rightButton?.physicsBody?.dynamic = false
-        leftButton?.physicsBody?.dynamic = false
+
         
-        paintMomAndBottle()
     }
     
     func paintBackGround(){
@@ -111,7 +100,6 @@ class GameScene: SKScene {
         let momTexture = SKTexture(imageNamed: "mom1.png")
         var momTextureArray:[SKTexture] = [momTexture]
         for i in 2...30{
-            let temp = (String)(i)
             momTextureArray.append(SKTexture(imageNamed: "mom"+(String)(i)+".png"))
         }
 
@@ -119,15 +107,14 @@ class GameScene: SKScene {
         mom.name = "mom"
         mom.position = CGPoint(x:self.frame.origin.x+300+mom.size.width/2+(CGFloat)(arc4random()%UInt32(self.frame.size.height-330-mom.size.width)), y:CGRectGetMidY(self.frame)-100+(CGFloat)(arc4random()%300))
         print(mom.position)
-        println("x:\(self.frame.origin.x+mom.size.width/2) width\(self.frame.size.height)")
-        self.addChild(mom)
+        
         var momChangeTexsure = SKAction.animateWithTextures(momTextureArray, timePerFrame: 0.1)
         var runMom = SKAction.repeatActionForever(momChangeTexsure)
         mom.setScale(0.6)
         mom.runAction(runMom)
         //add bottle
         let bottle = SKSpriteNode.init(imageNamed:"bottle.png")
-        bottle.position = CGPointMake(mom.position.x,mom.position.y+mom.size.height/3)
+        bottle.position = CGPointMake(mom.position.x,mom.position.y+mom.size.height*2/5)
         bottle.setScale(1)
         bottle.name = "bottle"
         //add physices for bottle
@@ -162,31 +149,31 @@ class GameScene: SKScene {
         bottle.physicsBody?.affectedByGravity = false
         bottle.physicsBody?.friction = 0
         bottle.physicsBody?.dynamic = false
-        println(bottle.size)
         self.addChild(bottle)
+        self.addChild(mom)
     }
-
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent?) {
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         for touch in touches {
             let clickNode = nodeAtPoint((touches as NSSet).anyObject()!.locationInNode(self))
-            println((touches as NSSet).anyObject()!.locationInNode(self))
+            
             if clickNode.name != nil{
                 if clickNode.name!.hasPrefix("button")
                 {
-                    changeButtonColor(clickNode as SKSpriteNode)
+                    changeButtonColor(clickNode as! SKSpriteNode)
                     for node in self.children{
                         if node.name == "tadpole"{
                             let bottle = self.childNodeWithName("bottle")
-                                if (node.position.x > (bottle.position.x-bottle.postion.width/2))&&(node.position.x < (bottle.position.x+bottle.postion.width/2)) && (node.postion.y > (bottle.position.y-bottle.position.height/2))&&(node.postion.y < (bottle.position.y+bottle.position.height/2)){
+                                if (node.position.x > (bottle!.position.x-bottle!.position.x/2))&&(node.position.x < (bottle!.position.x+bottle!.position.x/2)) && (node.position.y > (bottle!.position.y-bottle!.position.y/2))&&(node.position.y < (bottle!.position.y+bottle!.position.y/2)){
                                     continue
                                 }
                             if (touch.locationInNode(self).x > self.frame.size.width/2){
-                                (node as SKSpriteNode).physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                (node as! SKSpriteNode).physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                                   // node.physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                             }
                             else
                             {
-                                (node as SKSpriteNode).physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                (node as! SKSpriteNode).physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                                 //node.physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                             }
                         }
@@ -197,15 +184,15 @@ class GameScene: SKScene {
             
         }
     }
-    override func touchesEnded(touches: NSSet, withEvent event: UIEvent) {
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent!) {
         changeButtonColorBack(touches)
     }
     
-    override func touchesCancelled(touches: NSSet, withEvent event: UIEvent!) {
-        changeButtonColorBack(touches)
+    override func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
+        changeButtonColorBack(touches!)
     }
     
-    override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent!) {
         changeButtonColorBack(touches)
     }
     
@@ -214,7 +201,7 @@ class GameScene: SKScene {
         button.runAction(changeColor)
     }
     
-    func changeButtonColorBack(touches: NSSet){
+    func changeButtonColorBack(touches: Set<UITouch>){
         let leftButton = self.childNodeWithName("buttonLeft")
         let rightButton = self.childNodeWithName("buttonRight")
         
@@ -223,10 +210,10 @@ class GameScene: SKScene {
         if clickNode.name != nil{
             if clickNode.name == "buttonLeft"{
                 let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.3)
-                (leftButton as SKSpriteNode).runAction(changeColorBack)
+                (leftButton as! SKSpriteNode).runAction(changeColorBack)
             }else if clickNode.name == "buttonRight"{
                 let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.3)
-                (rightButton as SKSpriteNode).runAction(changeColorBack)
+                (rightButton as! SKSpriteNode).runAction(changeColorBack)
             }
         }
     }

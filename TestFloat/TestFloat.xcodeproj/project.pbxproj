@@ -7,22 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		403BF9731D4EF0CC00FC0180 /* sprites.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 403BF9721D4EF0CC00FC0180 /* sprites.atlas */; };
+		403BF9751D4EF51F00FC0180 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 403BF9741D4EF51F00FC0180 /* Assets.xcassets */; };
 		406EDD111D40D20D0063B40D /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 406EDD131D40D20D0063B40D /* GameScene.sks */; };
 		40DD6FBA1D3C7B50003BCC98 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40DD6FB91D3C7B50003BCC98 /* AppDelegate.swift */; };
 		40DD6FBE1D3C7B50003BCC98 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40DD6FBD1D3C7B50003BCC98 /* GameScene.swift */; };
 		40DD6FC01D3C7B50003BCC98 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40DD6FBF1D3C7B50003BCC98 /* GameViewController.swift */; };
 		40DD6FC31D3C7B50003BCC98 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 40DD6FC11D3C7B50003BCC98 /* Main.storyboard */; };
-		40DD6FC51D3C7B50003BCC98 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 40DD6FC41D3C7B50003BCC98 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		403BF9721D4EF0CC00FC0180 /* sprites.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = sprites.atlas; sourceTree = "<group>"; };
+		403BF9741D4EF51F00FC0180 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		406EDD121D40D20D0063B40D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = Base; path = Base.lproj/GameScene.sks; sourceTree = "<group>"; };
 		40DD6FB61D3C7B50003BCC98 /* TestFloat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestFloat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		40DD6FB91D3C7B50003BCC98 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		40DD6FBD1D3C7B50003BCC98 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		40DD6FBF1D3C7B50003BCC98 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		40DD6FC21D3C7B50003BCC98 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		40DD6FC41D3C7B50003BCC98 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		40DD6FC91D3C7B50003BCC98 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -56,12 +58,13 @@
 		40DD6FB81D3C7B50003BCC98 /* TestFloat */ = {
 			isa = PBXGroup;
 			children = (
+				403BF9741D4EF51F00FC0180 /* Assets.xcassets */,
 				40DD6FB91D3C7B50003BCC98 /* AppDelegate.swift */,
 				406EDD131D40D20D0063B40D /* GameScene.sks */,
 				40DD6FBD1D3C7B50003BCC98 /* GameScene.swift */,
 				40DD6FBF1D3C7B50003BCC98 /* GameViewController.swift */,
 				40DD6FC11D3C7B50003BCC98 /* Main.storyboard */,
-				40DD6FC41D3C7B50003BCC98 /* Assets.xcassets */,
+				403BF9721D4EF0CC00FC0180 /* sprites.atlas */,
 				40DD6FC91D3C7B50003BCC98 /* Info.plist */,
 			);
 			path = TestFloat;
@@ -126,7 +129,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				406EDD111D40D20D0063B40D /* GameScene.sks in Resources */,
-				40DD6FC51D3C7B50003BCC98 /* Assets.xcassets in Resources */,
+				403BF9731D4EF0CC00FC0180 /* sprites.atlas in Resources */,
+				403BF9751D4EF51F00FC0180 /* Assets.xcassets in Resources */,
 				40DD6FC31D3C7B50003BCC98 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -251,6 +255,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				INFOPLIST_FILE = TestFloat/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -263,6 +268,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				INFOPLIST_FILE = TestFloat/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
