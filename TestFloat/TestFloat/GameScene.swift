@@ -18,12 +18,12 @@ class GameScene: SKScene {
     let ForceButton_left = CGPoint(x: 340, y: 50)
     let ForceButton_right = CGPoint(x: 680, y: 50)
     let Force_down_rate:Float = 0.9
-    let Force_Vector_distance:Float = 30
+    let Force_Vector_distance:Float = 50
     let bottleGlassThick:CGFloat = 2
 
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
-        //let fieldCenter = self.childNodeWithName("SKSpriteNode_0")?.position
+        
         paintBackGround()
         paintMomAndBottle()
         
@@ -48,8 +48,8 @@ class GameScene: SKScene {
         print(self.frame.size.height)
         self.physicsBody?.friction = 0.0
         self.physicsWorld.gravity = CGVectorMake(0, -0.1)
-        let radialGravityField = self.childNodeWithName("SKVortexFieldNode_0")
-        radialGravityField!.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
+        //let radialGravityField = self.childNodeWithName("SKVortexFieldNode_0")
+        //radialGravityField!.position = fieldCenter! // CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
 
         //add tadpole
 
@@ -70,7 +70,7 @@ class GameScene: SKScene {
             tadpole.physicsBody!.restitution = 0.6
             tadpole.physicsBody!.linearDamping = 0.0
             tadpole.physicsBody!.allowsRotation = true
-            tadpole.physicsBody?.mass = 10
+            tadpole.physicsBody?.mass = 1
             tadpole.physicsBody?.density = 10
             tadpole.setScale(0.2)
             tadpole.name = "tadpole"
@@ -170,11 +170,30 @@ class GameScene: SKScene {
                             if (touch.locationInNode(self).x > self.frame.size.width/2){
                                 (node as! SKSpriteNode).physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                                   // node.physicsBody?.applyForce(force_right(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                
+                                //var VortexFieldNode = self.childNodeWithName("SKSpriteNode_2")
+                                var VortexFieldNode = SKFieldNode.vortexField()
+                                let strengthActionStart = SKAction.strengthBy(1, duration: 1)
+                                let strengthActionBack = SKAction.strengthBy(0, duration: 2)
+                                let strengthActionGroup = SKAction.group([strengthActionStart,strengthActionBack])
+                                VortexFieldNode.runAction(strengthActionGroup)
+                                VortexFieldNode.name = "VortexField"
+                                VortexFieldNode.position = (self.childNodeWithName("SKSpriteNode_2")?.position)!
+                                self.addChild(VortexFieldNode)
                             }
                             else
                             {
                                 (node as! SKSpriteNode).physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                                 //node.physicsBody?.applyForce(force_left(nodeVector(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                var VortexFieldNode = SKFieldNode.vortexField()
+                                let strengthActionStart = SKAction.strengthBy(1, duration: 1)
+                                let strengthActionBack = SKAction.strengthBy(0, duration: 2)
+                                let strengthActionGroup = SKAction.group([strengthActionStart,strengthActionBack])
+                                VortexFieldNode.runAction(strengthActionGroup)
+                                VortexFieldNode.direction = vector_float3(0,0,1)
+                                VortexFieldNode.name = "VortexField"
+                                VortexFieldNode.position = (self.childNodeWithName("SKSpriteNode_2")?.position)!
+                                self.addChild(VortexFieldNode)
                             }
                         }
                     }
@@ -197,7 +216,7 @@ class GameScene: SKScene {
     }
     
     func changeButtonColor(button:SKSpriteNode){
-        let changeColor = SKAction.colorizeWithColor(SKColor.greenColor(), colorBlendFactor: 5, duration: 0.1)
+        let changeColor = SKAction.colorizeWithColor(SKColor.greenColor(), colorBlendFactor: 1, duration: 0.1)
         button.runAction(changeColor)
     }
     
@@ -220,6 +239,8 @@ class GameScene: SKScene {
    
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
+        
+        
     }
     
     func nodeVector(originalForce:CGVector,nodeLocation:CGPoint)->CGVector{
