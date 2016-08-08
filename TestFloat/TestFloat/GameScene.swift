@@ -23,13 +23,15 @@ class GameScene: SKScene {
     let screen_top_right_point = CGPoint(x: 728, y: 768)
     let tadpole_come_in_point = CGPoint(x:512,y:0)
     
-    
-    
     let Force_down_rate:Float = 0.9
     let Force_Vector_distance:Float = 200
     let bottleGlassThick:CGFloat = 2
     var tadpoleNumberFirst:Bool = false
     let tadpoleNumber:Int = 10
+    //
+    //add bubble
+    
+    
     func testScreenSize(){
         let point1 = SKShapeNode.init(circleOfRadius: 100)
         point1.strokeColor = UIColor.blueColor()
@@ -85,23 +87,49 @@ class GameScene: SKScene {
         let tadpoleMove = SKAction.animateWithTextures(tadpoleArray, timePerFrame: 0.05)
         let runTadpole = SKAction.repeatActionForever(tadpoleMove)
         let tadpoleBallChangeTexture = SKAction.setTexture(tadpole1, resize: true)
-
-        //change size action
-//        let changeHeight = SKAction.resizeToHeight(tadpole1.size().height, duration: 0)
-//        let changeWidth = SKAction.resizeToWidth(tadpole1.size().width, duration: 0)
-//        let changeScale = SKAction.scaleTo(0.2, duration: 0)
-//        let changeSizeActionGroup = SKAction.group([changeHeight,changeWidth,changeScale])
         let tadpoleBallActionGroup = SKAction.sequence([tadpoleBallActionSequnce,tadpoleBallChangeTexture,runTadpole])
         
         tadpole.runAction(tadpoleBallActionGroup)
         self.addChild(tadpole)
 
     }
+    
+    //add bubble
+    func addbubble(color: NSString){
+        let bubble_blue_image = SKTexture(imageNamed: color as String)
+        let bubble_blue = SKSpriteNode(texture: bubble_blue_image)
+        bubble_blue.name = color as String
+        bubble_blue.setScale(0.01)
+        bubble_blue.alpha = 0.2
+        let locationX = arc4random()%UInt32(screen_width/2) +  (UInt32)(screen_width/4) + (UInt32)(ForceButton_left.x)
+        bubble_blue.position = CGPointMake((CGFloat)(locationX), screen_height/5)
+        
+        let bubble_blue_moveAction = SKAction.moveToY(screen_height, duration: 4)
+        let bubble_blue_scaleAction = SKAction.scaleTo(0.1, duration: 4)
+        let bubble_group = SKAction.group([bubble_blue_moveAction,bubble_blue_scaleAction])
+        //let bubble_alpha = SKAction.
+        let bubble_changeAlpha = SKAction.colorizeWithColor(SKColor.whiteColor(), colorBlendFactor: 1, duration: 0.5)
+        let bubble_removeFromParent = SKAction.removeFromParent()
+        let bubble_sequence = SKAction.sequence([bubble_group,bubble_changeAlpha,bubble_removeFromParent])
+        bubble_blue.runAction(bubble_sequence)
+        self.addChild(bubble_blue)
+    }
+    
+    
     override func didMoveToView(view: SKView) {
 
         paintBackGround()
         paintMomAndBottle()
-        
+
+        self.runAction(
+            SKAction.repeatActionForever(
+                SKAction.group([
+                    SKAction.sequence([SKAction.runBlock({self.addbubble("new_bubble")}),
+                        SKAction.waitForDuration(0.5)]),
+                    SKAction.sequence([SKAction.runBlock({self.addbubble("new_bubble")}),
+                        SKAction.waitForDuration(0.5)])
+                    ])
+                ))
         //Button
         let leftButton = self.childNodeWithName("buttonLeft")
         let rightButton = self.childNodeWithName("buttonRight")
@@ -283,9 +311,9 @@ class GameScene: SKScene {
                     for node in self.children{
                         if node.name == "tadpole"{
                             let bottle = self.childNodeWithName("bottle")
-//                                if (node.position.x > (bottle!.position.x-bottle!.position.x/2))&&(node.position.x < (bottle!.position.x+bottle!.position.x/2)) && (node.position.y > (bottle!.position.y-bottle!.position.y/2))&&(node.position.y < (bottle!.position.y+bottle!.position.y/2)){
-//                                    continue
-//                                }
+                                if (node.position.x > (bottle!.position.x-bottle!.position.x/2))&&(node.position.x < (bottle!.position.x+bottle!.position.x/2)) && (node.position.y > (bottle!.position.y-bottle!.position.y/2))&&(node.position.y < (bottle!.position.y+bottle!.position.y/2)){
+                                    continue
+                                }
                             if (touch.locationInNode(self).x > self.frame.size.width/2){
                                 //(node as! SKSpriteNode).physicsBody?.applyForce(force_right(nodeVectorRight(MAX_CGVector_NW, nodeLocation: node.position),nodeLocation:node.position))
                                 (node as! SKSpriteNode).physicsBody?.applyForce(force_right(nodeVectorRight(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
@@ -347,7 +375,7 @@ class GameScene: SKScene {
     func nodeVectorLeft(originalForce:CGVector,nodeLocation:CGPoint)->CGVector{
         let tempX = (nodeLocation.x-ForceButton_left.x)/sqrt(pow((nodeLocation.x-ForceButton_left.x), 2)+pow((nodeLocation.y-ForceButton_left.y),2))
         let tempY = (nodeLocation.y-ForceButton_left.y)/sqrt(pow((nodeLocation.x-ForceButton_left.x), 2)+pow((nodeLocation.y-ForceButton_left.y),2))
-        //println("right: \(tempX*originalForce.dx) + \(tempY*originalForce.dy)")
+        print("right: \(tempX*originalForce.dx) + \(tempY*originalForce.dy)")
         //println(CGVectorMake(tempX*originalForce.dx, tempY*originalForce.dy))
         return CGVectorMake(tempX*originalForce.dx, tempY*originalForce.dy)
     }
@@ -366,7 +394,7 @@ class GameScene: SKScene {
         let tempPowerDownRate = pow((CGFloat)(Force_down_rate), sqrt(pow(nodeLocation.x-ForceButton_left.x, 2.0)+pow(nodeLocation.y-ForceButton_left.y, 2.0))/(CGFloat)(Force_Vector_distance))
         
         //println(tempPowerDownRate)
-        //print(CGVectorMake(tempPowerDownRate*vector.dx, tempPowerDownRate*vector.dy))
+        print(CGVectorMake(tempPowerDownRate*vector.dx, tempPowerDownRate*vector.dy))
         //println(-tempPowerDownRate*vector.dx)
         //println(-tempPowerDownRate*vector.dy)
         return CGVectorMake(tempPowerDownRate*vector.dx, tempPowerDownRate*vector.dy)

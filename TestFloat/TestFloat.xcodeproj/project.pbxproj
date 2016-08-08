@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		403BF9731D4EF0CC00FC0180 /* sprites.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 403BF9721D4EF0CC00FC0180 /* sprites.atlas */; };
 		403BF9751D4EF51F00FC0180 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 403BF9741D4EF51F00FC0180 /* Assets.xcassets */; };
+		403DA9481D58737000599C81 /* bubble.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 403DA9471D58737000599C81 /* bubble.atlas */; };
 		406EDD111D40D20D0063B40D /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 406EDD131D40D20D0063B40D /* GameScene.sks */; };
 		40DD6FBA1D3C7B50003BCC98 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40DD6FB91D3C7B50003BCC98 /* AppDelegate.swift */; };
 		40DD6FBE1D3C7B50003BCC98 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40DD6FBD1D3C7B50003BCC98 /* GameScene.swift */; };
@@ -19,6 +20,7 @@
 /* Begin PBXFileReference section */
 		403BF9721D4EF0CC00FC0180 /* sprites.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = sprites.atlas; sourceTree = "<group>"; };
 		403BF9741D4EF51F00FC0180 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		403DA9471D58737000599C81 /* bubble.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = bubble.atlas; sourceTree = "<group>"; };
 		406EDD121D40D20D0063B40D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = Base; path = Base.lproj/GameScene.sks; sourceTree = "<group>"; };
 		40DD6FB61D3C7B50003BCC98 /* TestFloat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestFloat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		40DD6FB91D3C7B50003BCC98 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 				40DD6FBD1D3C7B50003BCC98 /* GameScene.swift */,
 				40DD6FBF1D3C7B50003BCC98 /* GameViewController.swift */,
 				40DD6FC11D3C7B50003BCC98 /* Main.storyboard */,
+				403DA9471D58737000599C81 /* bubble.atlas */,
 				403BF9721D4EF0CC00FC0180 /* sprites.atlas */,
 				40DD6FC91D3C7B50003BCC98 /* Info.plist */,
 			);
@@ -129,6 +132,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				406EDD111D40D20D0063B40D /* GameScene.sks in Resources */,
+				403DA9481D58737000599C81 /* bubble.atlas in Resources */,
 				403BF9731D4EF0CC00FC0180 /* sprites.atlas in Resources */,
 				403BF9751D4EF51F00FC0180 /* Assets.xcassets in Resources */,
 				40DD6FC31D3C7B50003BCC98 /* Main.storyboard in Resources */,
