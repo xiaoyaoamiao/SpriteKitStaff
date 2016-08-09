@@ -23,6 +23,7 @@ class GameScene: SKScene {
     let screen_top_left_point = CGPoint(x: 296, y: 768)
     let screen_top_right_point = CGPoint(x: 728, y: 768)
     let tadpole_come_in_point = CGPoint(x:512,y:0)
+    let ball_width:CGFloat = 95
     
     let Force_down_rate:Float = 0.9
     let Force_Vector_distance:Float = 200
@@ -31,6 +32,7 @@ class GameScene: SKScene {
     let tadpoleNumber:Int = 10
     //
     //music
+    var tadpoleComingMusic:AVAudioPlayer? = nil
     var backGroundMusic:AVAudioPlayer? = nil
     var scoreMusic:AVAudioPlayer? = nil
     var waterFireMusic:AVAudioPlayer? = nil
@@ -57,8 +59,6 @@ class GameScene: SKScene {
         self.addChild(point2)
         self.addChild(point3)
         self.addChild(point4)
-        print(self.scene?.frame.origin.x)
-        print(self.scene?.frame.origin.y)
     }
     func tadpole_growth(){
         let tadpole_children = SKTexture(imageNamed: "tadpoleball")
@@ -134,42 +134,44 @@ class GameScene: SKScene {
         var scorePath = NSBundle.mainBundle().pathForResource("score", ofType: "wav")
         var victoryPath = NSBundle.mainBundle().pathForResource("victory", ofType: "mp3")
         var failedPath = NSBundle.mainBundle().pathForResource("failed", ofType: "wav")
+        var comingPath = NSBundle.mainBundle().pathForResource("coming", ofType: "mp3")
+        
         var firePathURL = NSURL.fileURLWithPath(firePath!)
         var scorePathURL = NSURL.fileURLWithPath(firePath!)
+        var comingPathURL = NSURL.fileURLWithPath(comingPath!)
         waterFireMusic = AVAudioPlayer(contentsOfURL: firePathURL, error: nil)
         scoreMusic = AVAudioPlayer(contentsOfURL: scorePathURL, error: nil)
+        tadpoleComingMusic = AVAudioPlayer(contentsOfURL: comingPathURL, error: nil)
     }
-    
+    //add Emitter
     func addEmitter(direction:NSString){
         let bunble=SKEmitterNode(fileNamed: "Snow.sks")
         let leftButton = self.childNodeWithName("buttonLeft")
         if direction == "left"{
-            
-            bunble.position = CGPointMake(ForceButton_left.x+(leftButton as SKSpriteNode).size.width/2, ForceButton_left.y+(leftButton as SKSpriteNode).size.width/2)
+            bunble.position = CGPointMake(ForceButton_left.x+(leftButton as SKSpriteNode).size.width/2+30, ForceButton_left.y+(leftButton as SKSpriteNode).size.width/2+30)
             bunble.xAcceleration = 50
             bunble.emissionAngle = 45
         }else{
-            bunble.position = CGPointMake(ForceButton_right.x+(leftButton as SKSpriteNode).size.width/2-100, ForceButton_right.y+(leftButton as SKSpriteNode).size.width/2)
+            bunble.position = CGPointMake(ForceButton_right.x+(leftButton as SKSpriteNode).size.width/2-130, ForceButton_right.y+(leftButton as SKSpriteNode).size.width/2+30)
             bunble.xAcceleration = -50
             bunble.emissionAngle = 90
         }
-        
-
         self.addChild(bunble)
-        
         let emitterAdd = SKAction.waitForDuration(1)
         let emitterRemove = SKAction.removeFromParent()
         let emitterSequence = SKAction.sequence([emitterAdd,emitterRemove])
         bunble.runAction(emitterSequence)
     }
     
+    //Launch View
     override func didMoveToView(view: SKView) {
 
         paintBackGround()
         paintMomAndBottle()
         musicInitBackGroundMusic()
         musicInitOtherMusic()
-
+        addShimp()
+        
         self.runAction(
             SKAction.repeatActionForever(
                 SKAction.group([
@@ -279,9 +281,10 @@ class GameScene: SKScene {
         self.addChild(mom)
     }
     
-    override func touchesBegan(touches:NSSet, withEvent event: UIEvent!) {
+    override func touchesBegan(touches:NSSet, withEvent event: UIEvent) {
         for touch in touches {
             if tadpoleNumberFirst == false{
+                tadpoleComingMusic?.play()
                 self.runAction(
                     SKAction.repeatAction(
                         SKAction.sequence([
@@ -291,35 +294,6 @@ class GameScene: SKScene {
                 tadpoleNumberFirst = true
                 
                 return
-                //add tadpole
-                
-                //        let tadpole1 = SKTexture(imageNamed: "tadpole1.png")
-                //        let tadpole2 = SKTexture(imageNamed: "tadpole2.png")
-                //        let tadpole3 = SKTexture(imageNamed: "tadpole3.png")
-                //        let tadpole4 = SKTexture(imageNamed: "tadpole4.png")
-                //        let tadpoleArray = [tadpole1,tadpole2,tadpole3,tadpole4]
-                
-                //        for tadpoleNumber in 1...10{
-                //
-                //            let tadpole = SKSpriteNode(texture: tadpole1)
-                ////            let tadpole_children = SKTexture(imageNamed: "tadpoleball")
-                ////            let tadpole_children2 = SKSpriteNode(texture: tadpole_children)
-                //
-                //            tadpole.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
-                //            tadpole.physicsBody = SKPhysicsBody(circleOfRadius: tadpole.size.width/2)
-                //            tadpole.physicsBody!.friction = 1
-                //            tadpole.physicsBody!.restitution = 0.6
-                //            tadpole.physicsBody!.linearDamping = 0.0
-                //            tadpole.physicsBody!.allowsRotation = true
-                //            tadpole.physicsBody?.mass = 1
-                //            tadpole.physicsBody?.density = 10
-                //            tadpole.setScale(0.2)
-                //            tadpole.name = "tadpole"
-                //            self.addChild(tadpole)
-                //            let tadpoleMove = SKAction.animateWithTextures(tadpoleArray, timePerFrame: 0.05)
-                //            let runTadpole = SKAction.repeatActionForever(tadpoleMove)
-                //            tadpole.runAction(runTadpole)
-                //        }
             }
             
             let clickNode = nodeAtPoint((touches as NSSet).anyObject()!.locationInNode(self))
@@ -337,7 +311,14 @@ class GameScene: SKScene {
                     waterFireMusic?.play()
                     
                     if clickNode.name == "buttonLeft"{
-                        addEmitter("left")
+                        
+                        self.runAction(
+                            SKAction.repeatAction(
+                                SKAction.sequence([
+                                    SKAction.runBlock({self.addEmitter("left")}),
+                                    SKAction.waitForDuration(0.2)
+                                    ]), count: 3))
+                        
                         let VortexFieldNode = SKFieldNode.vortexField()
                         let strengthActionStart = SKAction.strengthBy(1, duration: 0.7)
                         let strengthActionBack = SKAction.strengthBy(0, duration: 4)
@@ -350,7 +331,12 @@ class GameScene: SKScene {
                         VortexFieldNode.position = (self.childNodeWithName("SKSpriteNode_2")?.position)!
                         VortexFieldNode.runAction(strengthActionGroup)
                     }else if clickNode.name == "buttonRight"{
-                        addEmitter("right")
+                        self.runAction(
+                            SKAction.repeatAction(
+                                SKAction.sequence([
+                                    SKAction.runBlock({self.addEmitter("right")}),
+                                    SKAction.waitForDuration(0.2)
+                                    ]), count: 3))
                         let VortexFieldNode = SKFieldNode.vortexField()
                         let strengthActionStart = SKAction.strengthBy(-1, duration: 0.7)
                         let strengthActionBack = SKAction.strengthBy(0, duration: 4)
@@ -466,5 +452,54 @@ class GameScene: SKScene {
         //println(-tempPowerDownRate*vector.dx)
         //println(-tempPowerDownRate*vector.dy)
         return CGVectorMake(tempPowerDownRate*vector.dx, tempPowerDownRate*vector.dy)
+    }
+    
+    //Add fishes
+    func addShimp(){
+        let leftButton = self.childNodeWithName("buttonLeft")
+        println((leftButton as SKSpriteNode).size)
+        let shimpTexture = SKTexture(imageNamed: "shimp_1.png")
+        var shimpTextureArray:[SKTexture] = [shimpTexture]
+        for i in 1...4{
+            shimpTextureArray.append(SKTexture(imageNamed: "shimp_"+(String)(i)+".png"))
+        }
+        
+        let shimp = SKSpriteNode(texture: shimpTexture)
+        shimp.name = "shimp"
+        shimp.position = CGPoint(x:ForceButton_left.x+ball_width+screen_width/2, y:ForceButton_left.y+ball_width)
+        
+        let shimpChangeTexsure = SKAction.animateWithTextures(shimpTextureArray, timePerFrame: 0.2)
+        let runShimp = SKAction.repeatActionForever(shimpChangeTexsure)
+        shimp.setScale(0.8)
+        shimp.runAction(runShimp)
+        self.addChild(shimp)
+    }
+    //Add fishe_1
+    func addFish_1(fishName:NSString,fishNumber:Int){
+        
+        var fishTextureNumber = 0
+        switch fishNumber{
+            case 1: fishTextureNumber = 4;break;
+            case 2: fishTextureNumber = 5;break;
+            case 3: fishTextureNumber = 8;break;
+            case 4: fishTextureNumber = 10;break;
+        default:break;
+        }
+        
+        let shimpTexture = SKTexture(imageNamed: fishName+"\(fishNumber)_1.png")
+        var shimpTextureArray:[SKTexture] = [shimpTexture]
+        for i in 1...fishTextureNumber{
+            shimpTextureArray.append(SKTexture(imageNamed: fishName+"\(fishNumber)_"+(String)(i)+".png"))
+        }
+        
+        let shimp = SKSpriteNode(texture: shimpTexture)
+        shimp.name = fishName+"\(fishNumber)"
+        shimp.position = CGPoint(x:ForceButton_left.x+ball_width+screen_width/2, y:ForceButton_left.y+ball_width)
+        
+        let shimpChangeTexsure = SKAction.animateWithTextures(shimpTextureArray, timePerFrame: 0.2)
+        let runShimp = SKAction.repeatActionForever(shimpChangeTexsure)
+        shimp.setScale(0.8)
+        shimp.runAction(runShimp)
+        self.addChild(shimp)
     }
 }
