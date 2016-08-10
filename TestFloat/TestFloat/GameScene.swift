@@ -164,11 +164,11 @@ class GameScene: SKScene {
         if direction == "left"{
             
             bunble!.position = CGPointMake(ForceButton_left.x+(leftButton as! SKSpriteNode).size.width/2, ForceButton_left.y+(leftButton as! SKSpriteNode).size.width/2)
-            bunble!.xAcceleration = 50
+            //bunble!.xAcceleration = 45
             bunble!.emissionAngle = 45
         }else{
             bunble!.position = CGPointMake(ForceButton_right.x+(leftButton as! SKSpriteNode).size.width/2-100, ForceButton_right.y+(leftButton as! SKSpriteNode).size.width/2)
-            bunble!.xAcceleration = -50
+            //bunble!.xAcceleration = -45
             bunble!.emissionAngle = 90
         }
         
