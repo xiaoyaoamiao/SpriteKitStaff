@@ -126,12 +126,12 @@ class GameScene: SKScene {
     func musicInitBackGroundMusic(){
         let path = NSBundle.mainBundle().pathForResource("playBackMusic1", ofType: "wav")
         let pathURL = NSURL.fileURLWithPath(path!)
-        do{
-            backGroundMusic = try AVAudioPlayer(contentsOfURL: pathURL)
-        }catch{
-            print(error)
-        }
-        
+//        do{
+//            backGroundMusic = try AVAudioPlayer(contentsOfURL: pathURL)
+//        }catch{
+//            print(error)
+//        }
+        backGroundMusic = AVAudioPlayer(contentsOfURL: pathURL, error:nil)
         backGroundMusic?.numberOfLoops = -1
         backGroundMusic?.play()
     }
@@ -146,30 +146,38 @@ class GameScene: SKScene {
         let scorePathURL = NSURL.fileURLWithPath(scorePath!)
         let comingPathURL = NSURL.fileURLWithPath(comingPath!)
         
-        do{
-            waterFireMusic = try AVAudioPlayer(contentsOfURL: firePathURL)
-            scoreMusic = try AVAudioPlayer(contentsOfURL: scorePathURL)
-            waterFireMusic = try AVAudioPlayer(contentsOfURL: firePathURL)
-            scoreMusic = try AVAudioPlayer(contentsOfURL: scorePathURL)
-            tadpoleComingMusic = try AVAudioPlayer(contentsOfURL: comingPathURL)
-        }catch{
-            print(error)
-        }
+//        do{
+//            waterFireMusic = try AVAudioPlayer(contentsOfURL: firePathURL)
+//            scoreMusic = try AVAudioPlayer(contentsOfURL: scorePathURL)
+//            waterFireMusic = try AVAudioPlayer(contentsOfURL: firePathURL)
+//            scoreMusic = try AVAudioPlayer(contentsOfURL: scorePathURL)
+//            tadpoleComingMusic = try AVAudioPlayer(contentsOfURL: comingPathURL)
+//        }catch{
+//            print(error)
+//        }
+        waterFireMusic =  AVAudioPlayer(contentsOfURL: firePathURL, error:nil)
+        scoreMusic =  AVAudioPlayer(contentsOfURL: scorePathURL, error:nil)
+        waterFireMusic =  AVAudioPlayer(contentsOfURL: firePathURL, error:nil)
+        scoreMusic =  AVAudioPlayer(contentsOfURL: scorePathURL, error:nil)
+        tadpoleComingMusic =  AVAudioPlayer(contentsOfURL: comingPathURL, error:nil)
 
     }
     //add Emitter
-    func addEmitter(direction:NSString){
+    func addEmitter(direction:NSString, clickedPoint: CGPoint){
         let bunble=SKEmitterNode(fileNamed: "Snow.sks")
         let leftButton = self.childNodeWithName("buttonLeft")
         if direction == "left"{
-            
-            bunble!.position = CGPointMake(ForceButton_left.x+(leftButton as! SKSpriteNode).size.width/2, ForceButton_left.y+(leftButton as! SKSpriteNode).size.width/2)
+            let emitPosition = caculateEmitPosition(clickedPoint, direction: "left")
+            println(emitPosition.x)
+            println(emitPosition.y)
+            bunble.position = emitPosition //CGPointMake(ForceButton_left.x+(leftButton as SKSpriteNode).size.width/2, ForceButton_left.y+(leftButton as SKSpriteNode).size.width/2)
             //bunble!.xAcceleration = 45
             bunble!.emissionAngle = 45
         }else{
-            bunble!.position = CGPointMake(ForceButton_right.x+(leftButton as! SKSpriteNode).size.width/2-100, ForceButton_right.y+(leftButton as! SKSpriteNode).size.width/2)
+            let emitPosition = caculateEmitPosition(clickedPoint, direction: "right")
+            bunble.position = emitPosition //CGPointMake(ForceButton_right.x+(leftButton as SKSpriteNode).size.width/2-100, ForceButton_right.y+(leftButton as SKSpriteNode).size.width/2)
             //bunble!.xAcceleration = -45
-            bunble!.emissionAngle = 90
+            bunble.emissionAngle = 90
         }
         
 
@@ -179,6 +187,42 @@ class GameScene: SKScene {
         let emitterRemove = SKAction.removeFromParent()
         let emitterSequence = SKAction.sequence([emitterAdd,emitterRemove])
         bunble!.runAction(emitterSequence)
+    }
+    
+    //caculate emitter position
+    func caculateEmitPosition(clickedPoint: CGPoint, direction: NSString) -> CGPoint{
+
+        if direction == "left"{
+            var emitPositionX = ForceButton_left.x + ball_width/2-5
+            var emitPositionY = ForceButton_left.y + ball_width/2-5
+            if (clickedPoint.x >= emitPositionX) && (clickedPoint.y >= emitPositionY){
+                emitPositionX += (ball_width/2*(clickedPoint.x-emitPositionX))/sqrt(pow(clickedPoint.x-emitPositionX, 2.0) + pow(clickedPoint.y-emitPositionY, 2.0))
+                emitPositionY += (ball_width/2*(clickedPoint.y-emitPositionY))/sqrt(pow(clickedPoint.x-emitPositionX, 2.0) + pow(clickedPoint.y-emitPositionY, 2.0))
+            }else if (clickedPoint.x < emitPositionX) && (clickedPoint.y >= emitPositionY){
+                emitPositionY += ball_width/2
+            }else if (clickedPoint.x < emitPositionX) && (clickedPoint.y < emitPositionY){
+                emitPositionX += sqrt(2) * ball_width/4
+                emitPositionY += sqrt(2) * ball_width/4
+            }else if (clickedPoint.x > emitPositionX ) && (clickedPoint.y < emitPositionY){
+                emitPositionX += ball_width/2
+            }
+            return CGPointMake(emitPositionX, emitPositionY)
+        }else {
+            var emitPositionX = ForceButton_right.x - ball_width/2
+            var emitPositionY = ForceButton_right.y + ball_width/2
+            if (clickedPoint.x <= emitPositionX) && (clickedPoint.y >= emitPositionY){
+                emitPositionX += (ball_width/2*(clickedPoint.x-emitPositionX))/sqrt(pow(clickedPoint.x-emitPositionX, 2.0) + pow(clickedPoint.y-emitPositionY, 2.0))
+                emitPositionY += (ball_width/2*(clickedPoint.y-emitPositionY))/sqrt(pow(clickedPoint.x-emitPositionX, 2.0) + pow(clickedPoint.y-emitPositionY, 2.0))
+            }else if (clickedPoint.x < emitPositionX) && (clickedPoint.y < emitPositionY){
+                emitPositionX -= ball_width/2
+            }else if (clickedPoint.x > emitPositionX) && (clickedPoint.y < emitPositionY){
+                emitPositionX -= sqrt(2) * ball_width/4
+                emitPositionY += sqrt(2) * ball_width/4
+            }else if (clickedPoint.x > emitPositionX ) && (clickedPoint.y >= emitPositionY){
+                emitPositionY += ball_width/2
+            }
+            return CGPointMake(emitPositionX, emitPositionY)
+        }
     }
     
     //Launch View
@@ -202,8 +246,8 @@ class GameScene: SKScene {
         let leftButton = self.childNodeWithName("buttonLeft")
         let rightButton = self.childNodeWithName("buttonRight")
 
-        leftButton!.physicsBody = SKPhysicsBody(circleOfRadius:(leftButton as! SKSpriteNode).size.width/2-5)
-        rightButton!.physicsBody = SKPhysicsBody(circleOfRadius:(rightButton as! SKSpriteNode).size.width/2-5)
+        leftButton!.physicsBody = SKPhysicsBody(circleOfRadius:(leftButton as SKSpriteNode).size.width/2-5)
+        rightButton!.physicsBody = SKPhysicsBody(circleOfRadius:(rightButton as SKSpriteNode).size.width/2-5)
         leftButton?.physicsBody?.affectedByGravity = false
         rightButton?.physicsBody?.affectedByGravity = false
         leftButton?.physicsBody?.friction = 0
@@ -298,8 +342,8 @@ class GameScene: SKScene {
         self.addChild(mom)
     }
     
-    override func touchesBegan(touches:Set<UITouch>, withEvent event: UIEvent!) {
- //   override func touchesBegan(touches:NSSet, withEvent event: UIEvent) {
+  //  override func touchesBegan(touches:NSSet, withEvent event: UIEvent!) {
+    override func touchesBegan(touches:NSSet, withEvent event: UIEvent) {
         for touch in touches {
             if tadpoleNumberFirst == false{
                 tadpoleComingMusic?.play()
@@ -310,13 +354,11 @@ class GameScene: SKScene {
                             SKAction.waitForDuration(0.1)
                             ]), count: tadpoleNumber))
                 tadpoleNumberFirst = true
-                
                 return
             }
-            
-            let clickNode = nodeAtPoint((touches as NSSet).anyObject()!.locationInNode(self))
-            
-            print((touches as NSSet).anyObject()!.locationInNode(self))
+            let clickedPoint = (touches as NSSet).anyObject()!.locationInNode(self)
+            let clickNode = nodeAtPoint(clickedPoint)
+            print(clickedPoint)
             
             if clickNode.name != nil{
                 //println(clickNode.name!+"---test")
@@ -333,7 +375,7 @@ class GameScene: SKScene {
                         self.runAction(
                             SKAction.repeatAction(
                                 SKAction.sequence([
-                                    SKAction.runBlock({self.addEmitter("left")}),
+                                    SKAction.runBlock({self.addEmitter("left", clickedPoint:clickedPoint)}),
                                     SKAction.waitForDuration(0.2)
                                     ]), count: 3))
                         
@@ -352,7 +394,7 @@ class GameScene: SKScene {
                         self.runAction(
                             SKAction.repeatAction(
                                 SKAction.sequence([
-                                    SKAction.runBlock({self.addEmitter("right")}),
+                                    SKAction.runBlock({self.addEmitter("right", clickedPoint:clickedPoint)}),
                                     SKAction.waitForDuration(0.2)
                                     ]), count: 3))
                         let VortexFieldNode = SKFieldNode.vortexField()
@@ -369,7 +411,7 @@ class GameScene: SKScene {
                     }
                 
                     
-                    changeButtonColor(clickNode as! SKSpriteNode)
+                    changeButtonColor(clickNode as SKSpriteNode)
                     for node in self.children{
                         if node.name == "tadpole"{
                             let bottle = self.childNodeWithName("bottle")
@@ -377,13 +419,13 @@ class GameScene: SKScene {
                                     continue
                                 }
                             if (touch.locationInNode(self).x > self.frame.size.width/2){
-                                (node as! SKSpriteNode).physicsBody?.applyForce(force_right(nodeVectorRight(MAX_CGVector_NW, nodeLocation: node.position),nodeLocation:node.position))
-                                //(node as SKSpriteNode).physicsBody?.applyForce(force_right(nodeVectorRight(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                //(node as! SKSpriteNode).physicsBody?.applyForce(force_right(nodeVectorRight(MAX_CGVector_NW, nodeLocation: node.position),nodeLocation:node.position))
+                                (node as SKSpriteNode).physicsBody?.applyForce(force_right(nodeVectorRight(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                             }
                             else
                             {
-                                //(node as SKSpriteNode).physicsBody?.applyForce(force_left(nodeVectorLeft(MAX_CGVector_NW, nodeLocation: node.position),nodeLocation:node.position))
-                                (node as! SKSpriteNode).physicsBody?.applyForce(force_left(nodeVectorLeft(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                (node as SKSpriteNode).physicsBody?.applyForce(force_left(nodeVectorLeft(MAX_CGVector_NW, nodeLocation: node.position),nodeLocation:node.position))
+                                //(node as! SKSpriteNode).physicsBody?.applyForce(force_left(nodeVectorLeft(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                             }
                         }
                     }
@@ -394,16 +436,16 @@ class GameScene: SKScene {
         }
     }
     
-    override func touchesEnded(touches:Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesEnded(touches:NSSet, withEvent event: UIEvent) {
         changeButtonColorBack(touches)
 
     }
     
-    override func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
-        changeButtonColorBack(touches!)
+    override func touchesCancelled(touches: NSSet, withEvent event: UIEvent) {
+        changeButtonColorBack(touches)
     }
     
-    override func touchesMoved(touches:Set<UITouch>, withEvent event: UIEvent!) {
+    override func touchesMoved(touches:NSSet, withEvent event: UIEvent) {
         changeButtonColorBack(touches)
     }
     
@@ -412,7 +454,7 @@ class GameScene: SKScene {
         button.runAction(changeColor)
     }
     
-    func changeButtonColorBack(touches: Set<UITouch>){
+    func changeButtonColorBack(touches: NSSet){
         let leftButton = self.childNodeWithName("buttonLeft")
         let rightButton = self.childNodeWithName("buttonRight")
         
@@ -421,10 +463,10 @@ class GameScene: SKScene {
         if clickNode.name != nil{
             if clickNode.name == "buttonLeft"{
                 let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.8)
-                (leftButton as! SKSpriteNode).runAction(changeColorBack)
+                (leftButton as SKSpriteNode).runAction(changeColorBack)
             }else if clickNode.name == "buttonRight"{
                 let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.8)
-                (rightButton as! SKSpriteNode).runAction(changeColorBack)
+                (rightButton as SKSpriteNode).runAction(changeColorBack)
             }
         }
     }
@@ -475,7 +517,7 @@ class GameScene: SKScene {
     //Add fishes
     func addShimp(){
         let leftButton = self.childNodeWithName("buttonLeft")
-        print((leftButton as! SKSpriteNode).size)
+        print((leftButton as SKSpriteNode).size)
         let shimpTexture = SKTexture(imageNamed: "shimp_1.png")
         var shimpTextureArray:[SKTexture] = [shimpTexture]
         for i in 1...4{
