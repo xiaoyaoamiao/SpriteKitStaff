@@ -8,6 +8,7 @@
 
 import SpriteKit
 import Darwin
+import AVFoundation
 
 class GameScene: SKScene {
     
@@ -29,7 +30,12 @@ class GameScene: SKScene {
     var tadpoleNumberFirst:Bool = false
     let tadpoleNumber:Int = 10
     //
-    //add bubble
+    //music
+    var backGroundMusic:AVAudioPlayer? = nil
+    var scoreMusic:AVAudioPlayer? = nil
+    var waterFireMusic:AVAudioPlayer? = nil
+    //countr score
+    var scoreNumber:Int = 0
     
     
     func testScreenSize(){
@@ -115,11 +121,54 @@ class GameScene: SKScene {
         self.addChild(bubble_blue)
     }
     
+    //init playback music
+    func musicInitBackGroundMusic(){
+        var path = NSBundle.mainBundle().pathForResource("playBackMusic1", ofType: "wav")
+        var pathURL = NSURL.fileURLWithPath(path!)
+        backGroundMusic = AVAudioPlayer?(contentsOfURL: pathURL,fileTypeHintr: nil)
+        backGroundMusic?.numberOfLoops = -1
+        backGroundMusic?.play()
+    }
+    func musicInitOtherMusic(){
+        var firePath = NSBundle.mainBundle().pathForResource("fire", ofType: "wav")
+        var scorePath = NSBundle.mainBundle().pathForResource("score", ofType: "wav")
+        var victoryPath = NSBundle.mainBundle().pathForResource("victory", ofType: "mp3")
+        var failedPath = NSBundle.mainBundle().pathForResource("failed", ofType: "wav")
+        var firePathURL = NSURL.fileURLWithPath(firePath!)
+        var scorePathURL = NSURL.fileURLWithPath(firePath!)
+        waterFireMusic = AVAudioPlayer?(contentsOfURL: firePathURL, fileTypeHint: nil)
+        scoreMusic = AVAudioPlayer?(contentsOfURL: scorePathURL, fileTypeHint: nil)
+    }
+    
+    func addEmitter(direction:NSString){
+        let bunble=SKEmitterNode(fileNamed: "Snow.sks")
+        let leftButton = self.childNodeWithName("buttonLeft")
+        if direction == "left"{
+            
+            bunble!.position = CGPointMake(ForceButton_left.x+(leftButton as! SKSpriteNode).size.width/2, ForceButton_left.y+(leftButton as! SKSpriteNode).size.width/2)
+            bunble!.xAcceleration = 50
+            bunble!.emissionAngle = 45
+        }else{
+            bunble!.position = CGPointMake(ForceButton_right.x+(leftButton as! SKSpriteNode).size.width/2-100, ForceButton_right.y+(leftButton as! SKSpriteNode).size.width/2)
+            bunble!.xAcceleration = -50
+            bunble!.emissionAngle = 90
+        }
+        
+
+        self.addChild(bunble!)
+        
+        let emitterAdd = SKAction.waitForDuration(1)
+        let emitterRemove = SKAction.removeFromParent()
+        let emitterSequence = SKAction.sequence([emitterAdd,emitterRemove])
+        bunble!.runAction(emitterSequence)
+    }
     
     override func didMoveToView(view: SKView) {
 
         paintBackGround()
         paintMomAndBottle()
+        musicInitBackGroundMusic()
+        musicInitOtherMusic()
 
         self.runAction(
             SKAction.repeatActionForever(
@@ -241,35 +290,7 @@ class GameScene: SKScene {
                             ]), count: tadpoleNumber))
                 tadpoleNumberFirst = true
                 
-                //add tadpole
-                
-                //        let tadpole1 = SKTexture(imageNamed: "tadpole1.png")
-                //        let tadpole2 = SKTexture(imageNamed: "tadpole2.png")
-                //        let tadpole3 = SKTexture(imageNamed: "tadpole3.png")
-                //        let tadpole4 = SKTexture(imageNamed: "tadpole4.png")
-                //        let tadpoleArray = [tadpole1,tadpole2,tadpole3,tadpole4]
-                
-                //        for tadpoleNumber in 1...10{
-                //
-                //            let tadpole = SKSpriteNode(texture: tadpole1)
-                ////            let tadpole_children = SKTexture(imageNamed: "tadpoleball")
-                ////            let tadpole_children2 = SKSpriteNode(texture: tadpole_children)
-                //
-                //            tadpole.position = CGPoint(x:self.frame.origin.x+300+(CGFloat)(arc4random()%UInt32(self.frame.size.height-400)), y:CGRectGetMidY(self.frame))
-                //            tadpole.physicsBody = SKPhysicsBody(circleOfRadius: tadpole.size.width/2)
-                //            tadpole.physicsBody!.friction = 1
-                //            tadpole.physicsBody!.restitution = 0.6
-                //            tadpole.physicsBody!.linearDamping = 0.0
-                //            tadpole.physicsBody!.allowsRotation = true
-                //            tadpole.physicsBody?.mass = 1
-                //            tadpole.physicsBody?.density = 10
-                //            tadpole.setScale(0.2)
-                //            tadpole.name = "tadpole"
-                //            self.addChild(tadpole)
-                //            let tadpoleMove = SKAction.animateWithTextures(tadpoleArray, timePerFrame: 0.05)
-                //            let runTadpole = SKAction.repeatActionForever(tadpoleMove)
-                //            tadpole.runAction(runTadpole)
-                //        }
+                return
             }
             
             let clickNode = nodeAtPoint((touches as NSSet).anyObject()!.locationInNode(self))
@@ -280,7 +301,14 @@ class GameScene: SKScene {
                 //println(clickNode.name!+"---test")
                 if clickNode.name!.hasPrefix("button")
                 {
+                    
+                    if waterFireMusic?.playing == true {
+                        waterFireMusic?.stop()
+                    }
+                    waterFireMusic?.play()
+                    
                     if clickNode.name == "buttonLeft"{
+                        addEmitter("left")
                         let VortexFieldNode = SKFieldNode.vortexField()
                         let strengthActionStart = SKAction.strengthBy(1, duration: 0.7)
                         let strengthActionBack = SKAction.strengthBy(0, duration: 4)
@@ -293,6 +321,7 @@ class GameScene: SKScene {
                         VortexFieldNode.position = (self.childNodeWithName("SKSpriteNode_2")?.position)!
                         VortexFieldNode.runAction(strengthActionGroup)
                     }else if clickNode.name == "buttonRight"{
+                        addEmitter("right")
                         let VortexFieldNode = SKFieldNode.vortexField()
                         let strengthActionStart = SKAction.strengthBy(-1, duration: 0.7)
                         let strengthActionBack = SKAction.strengthBy(0, duration: 4)
@@ -315,13 +344,13 @@ class GameScene: SKScene {
                                     continue
                                 }
                             if (touch.locationInNode(self).x > self.frame.size.width/2){
-                                //(node as! SKSpriteNode).physicsBody?.applyForce(force_right(nodeVectorRight(MAX_CGVector_NW, nodeLocation: node.position),nodeLocation:node.position))
-                                (node as! SKSpriteNode).physicsBody?.applyForce(force_right(nodeVectorRight(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                (node as! SKSpriteNode).physicsBody?.applyForce(force_right(nodeVectorRight(MAX_CGVector_NW, nodeLocation: node.position),nodeLocation:node.position))
+                                //(node as SKSpriteNode).physicsBody?.applyForce(force_right(nodeVectorRight(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                             }
                             else
                             {
-                                (node as! SKSpriteNode).physicsBody?.applyForce(force_left(nodeVectorLeft(MAX_CGVector_NW, nodeLocation: node.position),nodeLocation:node.position))
-                                //(node as! SKSpriteNode).physicsBody?.applyForce(force_left(nodeVectorLeft(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
+                                //(node as SKSpriteNode).physicsBody?.applyForce(force_left(nodeVectorLeft(MAX_CGVector_NW, nodeLocation: node.position),nodeLocation:node.position))
+                                (node as! SKSpriteNode).physicsBody?.applyForce(force_left(nodeVectorLeft(MAX_CGVector_NE, nodeLocation: node.position),nodeLocation:node.position))
                             }
                         }
                     }
@@ -334,6 +363,7 @@ class GameScene: SKScene {
     
     override func touchesEnded(touches:Set<UITouch>, withEvent event: UIEvent?) {
         changeButtonColorBack(touches)
+
     }
     
     override func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
@@ -357,10 +387,10 @@ class GameScene: SKScene {
 
         if clickNode.name != nil{
             if clickNode.name == "buttonLeft"{
-                let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.3)
+                let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.8)
                 (leftButton as! SKSpriteNode).runAction(changeColorBack)
             }else if clickNode.name == "buttonRight"{
-                let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.3)
+                let changeColorBack = SKAction.colorizeWithColorBlendFactor(0, duration: 0.8)
                 (rightButton as! SKSpriteNode).runAction(changeColorBack)
             }
         }

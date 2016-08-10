@@ -78,6 +78,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         spriteNode.runAction(kickOffActionGroup)
         spriteNode2.runAction(kickOffActionGroup2)
     }
+    override func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
+
+    }
 
 
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
