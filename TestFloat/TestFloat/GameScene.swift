@@ -23,6 +23,7 @@ class GameScene: SKScene {
     let screen_top_left_point = CGPoint(x: 296, y: 768)
     let screen_top_right_point = CGPoint(x: 728, y: 768)
     let tadpole_come_in_point = CGPoint(x:512,y:0)
+    let ball_width:CGFloat = 95
     
     let Force_down_rate:Float = 0.9
     let Force_Vector_distance:Float = 200
@@ -31,6 +32,7 @@ class GameScene: SKScene {
     let tadpoleNumber:Int = 10
     //
     //music
+    var tadpoleComingMusic:AVAudioPlayer? = nil
     var backGroundMusic:AVAudioPlayer? = nil
     var scoreMusic:AVAudioPlayer? = nil
     var waterFireMusic:AVAudioPlayer? = nil
@@ -57,8 +59,7 @@ class GameScene: SKScene {
         self.addChild(point2)
         self.addChild(point3)
         self.addChild(point4)
-        print(self.scene?.frame.origin.x)
-        print(self.scene?.frame.origin.y)
+        
     }
     func tadpole_growth(){
         let tadpole_children = SKTexture(imageNamed: "tadpoleball")
@@ -123,23 +124,40 @@ class GameScene: SKScene {
     
     //init playback music
     func musicInitBackGroundMusic(){
-        var path = NSBundle.mainBundle().pathForResource("playBackMusic1", ofType: "wav")
-        var pathURL = NSURL.fileURLWithPath(path!)
-        backGroundMusic = AVAudioPlayer?(contentsOfURL: pathURL,fileTypeHintr: nil)
+        let path = NSBundle.mainBundle().pathForResource("playBackMusic1", ofType: "wav")
+        let pathURL = NSURL.fileURLWithPath(path!)
+        do{
+            backGroundMusic = try AVAudioPlayer(contentsOfURL: pathURL)
+        }catch{
+            print(error)
+        }
+        
         backGroundMusic?.numberOfLoops = -1
         backGroundMusic?.play()
     }
     func musicInitOtherMusic(){
-        var firePath = NSBundle.mainBundle().pathForResource("fire", ofType: "wav")
-        var scorePath = NSBundle.mainBundle().pathForResource("score", ofType: "wav")
-        var victoryPath = NSBundle.mainBundle().pathForResource("victory", ofType: "mp3")
-        var failedPath = NSBundle.mainBundle().pathForResource("failed", ofType: "wav")
-        var firePathURL = NSURL.fileURLWithPath(firePath!)
-        var scorePathURL = NSURL.fileURLWithPath(firePath!)
-        waterFireMusic = AVAudioPlayer?(contentsOfURL: firePathURL, fileTypeHint: nil)
-        scoreMusic = AVAudioPlayer?(contentsOfURL: scorePathURL, fileTypeHint: nil)
+        let firePath = NSBundle.mainBundle().pathForResource("fire", ofType: "wav")
+        let scorePath = NSBundle.mainBundle().pathForResource("score", ofType: "wav")
+        //let victoryPath = NSBundle.mainBundle().pathForResource("victory", ofType: "mp3")
+        //let failedPath = NSBundle.mainBundle().pathForResource("failed", ofType: "wav")
+        let comingPath = NSBundle.mainBundle().pathForResource("coming", ofType: "mp3")
+        
+        let firePathURL = NSURL.fileURLWithPath(firePath!)
+        let scorePathURL = NSURL.fileURLWithPath(scorePath!)
+        let comingPathURL = NSURL.fileURLWithPath(comingPath!)
+        
+        do{
+            waterFireMusic = try AVAudioPlayer(contentsOfURL: firePathURL)
+            scoreMusic = try AVAudioPlayer(contentsOfURL: scorePathURL)
+            waterFireMusic = try AVAudioPlayer(contentsOfURL: firePathURL)
+            scoreMusic = try AVAudioPlayer(contentsOfURL: scorePathURL)
+            tadpoleComingMusic = try AVAudioPlayer(contentsOfURL: comingPathURL)
+        }catch{
+            print(error)
+        }
+
     }
-    
+    //add Emitter
     func addEmitter(direction:NSString){
         let bunble=SKEmitterNode(fileNamed: "Snow.sks")
         let leftButton = self.childNodeWithName("buttonLeft")
@@ -163,13 +181,14 @@ class GameScene: SKScene {
         bunble!.runAction(emitterSequence)
     }
     
+    //Launch View
     override func didMoveToView(view: SKView) {
-
         paintBackGround()
         paintMomAndBottle()
         musicInitBackGroundMusic()
         musicInitOtherMusic()
-
+        addShimp()
+        
         self.runAction(
             SKAction.repeatActionForever(
                 SKAction.group([
@@ -280,8 +299,10 @@ class GameScene: SKScene {
     }
     
     override func touchesBegan(touches:Set<UITouch>, withEvent event: UIEvent!) {
+ //   override func touchesBegan(touches:NSSet, withEvent event: UIEvent) {
         for touch in touches {
             if tadpoleNumberFirst == false{
+                tadpoleComingMusic?.play()
                 self.runAction(
                     SKAction.repeatAction(
                         SKAction.sequence([
@@ -308,7 +329,14 @@ class GameScene: SKScene {
                     waterFireMusic?.play()
                     
                     if clickNode.name == "buttonLeft"{
-                        addEmitter("left")
+                        
+                        self.runAction(
+                            SKAction.repeatAction(
+                                SKAction.sequence([
+                                    SKAction.runBlock({self.addEmitter("left")}),
+                                    SKAction.waitForDuration(0.2)
+                                    ]), count: 3))
+                        
                         let VortexFieldNode = SKFieldNode.vortexField()
                         let strengthActionStart = SKAction.strengthBy(1, duration: 0.7)
                         let strengthActionBack = SKAction.strengthBy(0, duration: 4)
@@ -321,7 +349,12 @@ class GameScene: SKScene {
                         VortexFieldNode.position = (self.childNodeWithName("SKSpriteNode_2")?.position)!
                         VortexFieldNode.runAction(strengthActionGroup)
                     }else if clickNode.name == "buttonRight"{
-                        addEmitter("right")
+                        self.runAction(
+                            SKAction.repeatAction(
+                                SKAction.sequence([
+                                    SKAction.runBlock({self.addEmitter("right")}),
+                                    SKAction.waitForDuration(0.2)
+                                    ]), count: 3))
                         let VortexFieldNode = SKFieldNode.vortexField()
                         let strengthActionStart = SKAction.strengthBy(-1, duration: 0.7)
                         let strengthActionBack = SKAction.strengthBy(0, duration: 4)
@@ -437,5 +470,54 @@ class GameScene: SKScene {
         //println(-tempPowerDownRate*vector.dx)
         //println(-tempPowerDownRate*vector.dy)
         return CGVectorMake(tempPowerDownRate*vector.dx, tempPowerDownRate*vector.dy)
+    }
+    
+    //Add fishes
+    func addShimp(){
+        let leftButton = self.childNodeWithName("buttonLeft")
+        print((leftButton as! SKSpriteNode).size)
+        let shimpTexture = SKTexture(imageNamed: "shimp_1.png")
+        var shimpTextureArray:[SKTexture] = [shimpTexture]
+        for i in 1...4{
+            shimpTextureArray.append(SKTexture(imageNamed: "shimp_"+(String)(i)+".png"))
+        }
+        
+        let shimp = SKSpriteNode(texture: shimpTexture)
+        shimp.name = "shimp"
+        shimp.position = CGPoint(x:ForceButton_left.x+ball_width+screen_width/2, y:ForceButton_left.y+ball_width)
+        
+        let shimpChangeTexsure = SKAction.animateWithTextures(shimpTextureArray, timePerFrame: 0.2)
+        let runShimp = SKAction.repeatActionForever(shimpChangeTexsure)
+        shimp.setScale(0.8)
+        shimp.runAction(runShimp)
+        self.addChild(shimp)
+    }
+    //Add fishe_1
+    func addFish_1(fishName:NSString,fishNumber:Int){
+        
+        var fishTextureNumber = 0
+        switch fishNumber{
+            case 1: fishTextureNumber = 4;break;
+            case 2: fishTextureNumber = 5;break;
+            case 3: fishTextureNumber = 8;break;
+            case 4: fishTextureNumber = 10;break;
+        default:break;
+        }
+        
+        let shimpTexture = SKTexture(imageNamed: (fishName as String)+"\(fishNumber)_1.png")
+        var shimpTextureArray:[SKTexture] = [shimpTexture]
+        for i in 1...fishTextureNumber{
+            shimpTextureArray.append(SKTexture(imageNamed: (fishName as String)+"\(fishNumber)_"+(String)(i)+".png"))
+        }
+        
+        let shimp = SKSpriteNode(texture: shimpTexture)
+        shimp.name = (fishName as String)+"\(fishNumber)"
+        shimp.position = CGPoint(x:ForceButton_left.x+ball_width+screen_width/2, y:ForceButton_left.y+ball_width)
+        
+        let shimpChangeTexsure = SKAction.animateWithTextures(shimpTextureArray, timePerFrame: 0.2)
+        let runShimp = SKAction.repeatActionForever(shimpChangeTexsure)
+        shimp.setScale(0.8)
+        shimp.runAction(runShimp)
+        self.addChild(shimp)
     }
 }

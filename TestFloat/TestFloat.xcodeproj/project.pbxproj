@@ -23,7 +23,9 @@
 		4167488A1D58E55A005C036D /* playBackMusic2.wav in Resources */ = {isa = PBXBuildFile; fileRef = 416748841D58E55A005C036D /* playBackMusic2.wav */; };
 		4167488B1D58E55A005C036D /* score.wav in Resources */ = {isa = PBXBuildFile; fileRef = 416748851D58E55A005C036D /* score.wav */; };
 		4167488C1D58E55A005C036D /* victory.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 416748861D58E55A005C036D /* victory.mp3 */; };
-		416748921D58F559005C036D /* Snow.sks in Resources */ = {isa = PBXBuildFile; fileRef = 416748911D58F559005C036D /* Snow.sks */; };
+		417755FF1D5A238100C1DDCE /* Snow.sks in Resources */ = {isa = PBXBuildFile; fileRef = 417755FE1D5A238100C1DDCE /* Snow.sks */; };
+		417756011D5A252500C1DDCE /* coming.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 417756001D5A252500C1DDCE /* coming.mp3 */; };
+		417756031D5A2B8500C1DDCE /* fishes.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 417756021D5A2B8500C1DDCE /* fishes.atlas */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,7 +47,9 @@
 		416748841D58E55A005C036D /* playBackMusic2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = playBackMusic2.wav; sourceTree = "<group>"; };
 		416748851D58E55A005C036D /* score.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = score.wav; sourceTree = "<group>"; };
 		416748861D58E55A005C036D /* victory.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = victory.mp3; sourceTree = "<group>"; };
-		416748911D58F559005C036D /* Snow.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = Snow.sks; path = ../../../../../../../Desktop/Snow.sks; sourceTree = "<group>"; };
+		417755FE1D5A238100C1DDCE /* Snow.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Snow.sks; sourceTree = "<group>"; };
+		417756001D5A252500C1DDCE /* coming.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = coming.mp3; sourceTree = "<group>"; };
+		417756021D5A2B8500C1DDCE /* fishes.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = fishes.atlas; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,7 +84,7 @@
 		40DD6FB81D3C7B50003BCC98 /* TestFloat */ = {
 			isa = PBXGroup;
 			children = (
-				416748911D58F559005C036D /* Snow.sks */,
+				417755FE1D5A238100C1DDCE /* Snow.sks */,
 				416748801D58E531005C036D /* Supporting Files */,
 				403BF9741D4EF51F00FC0180 /* Assets.xcassets */,
 				40DD6FB91D3C7B50003BCC98 /* AppDelegate.swift */,
@@ -88,6 +92,7 @@
 				40DD6FBD1D3C7B50003BCC98 /* GameScene.swift */,
 				40DD6FBF1D3C7B50003BCC98 /* GameViewController.swift */,
 				40DD6FC11D3C7B50003BCC98 /* Main.storyboard */,
+				417756021D5A2B8500C1DDCE /* fishes.atlas */,
 				403DA9471D58737000599C81 /* bubble.atlas */,
 				403BF9721D4EF0CC00FC0180 /* sprites.atlas */,
 				40DD6FC91D3C7B50003BCC98 /* Info.plist */,
@@ -99,6 +104,7 @@
 		416748801D58E531005C036D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				417756001D5A252500C1DDCE /* coming.mp3 */,
 				416748811D58E55A005C036D /* failed.wav */,
 				416748821D58E55A005C036D /* fire.wav */,
 				416748831D58E55A005C036D /* playBackMusic1.wav */,
@@ -169,11 +175,13 @@
 			files = (
 				406EDD111D40D20D0063B40D /* GameScene.sks in Resources */,
 				4167488A1D58E55A005C036D /* playBackMusic2.wav in Resources */,
+				417756011D5A252500C1DDCE /* coming.mp3 in Resources */,
+				417755FF1D5A238100C1DDCE /* Snow.sks in Resources */,
 				403DA9481D58737000599C81 /* bubble.atlas in Resources */,
+				417756031D5A2B8500C1DDCE /* fishes.atlas in Resources */,
 				4167488B1D58E55A005C036D /* score.wav in Resources */,
 				416748881D58E55A005C036D /* fire.wav in Resources */,
 				403BF9731D4EF0CC00FC0180 /* sprites.atlas in Resources */,
-				416748921D58F559005C036D /* Snow.sks in Resources */,
 				416748871D58E55A005C036D /* failed.wav in Resources */,
 				4167488C1D58E55A005C036D /* victory.mp3 in Resources */,
 				403BF9751D4EF51F00FC0180 /* Assets.xcassets in Resources */,
