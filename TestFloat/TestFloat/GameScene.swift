@@ -243,25 +243,28 @@ class GameScene: SKScene {
     
     func paintMomAndBottle(){
         //add mom
-        let momTexture = SKTexture(imageNamed: "mom1.png")
+        let momTexture = SKTexture(imageNamed: "mom1.png") //mom1.png
         var momTextureArray:[SKTexture] = [momTexture]
+    //    var momTextureArray:[SKTexture] = [momTexture,momTexture2,momTexture3,momTexture4]
         for i in 2...30{
-            momTextureArray.append(SKTexture(imageNamed: "mom"+(String)(i)+".png"))
+            let momTextureTemp = SKTexture(imageNamed: "mom"+(String)(i)+".png")
+            momTextureArray.append(momTextureTemp)
         }
 
         let mom = SKSpriteNode(texture: momTexture)
+        mom.setScale(0.6)
         mom.name = "mom"
         mom.position = CGPoint(x:self.frame.origin.x+300+mom.size.width/2+(CGFloat)(arc4random()%UInt32(self.frame.size.height-330-mom.size.width)), y:CGRectGetMidY(self.frame)-100+(CGFloat)(arc4random()%300))
         
-        let momChangeTexsure = SKAction.animateWithTextures(momTextureArray, timePerFrame: 0.1)
+        let momChangeTexsure = SKAction.animateWithTextures(momTextureArray, timePerFrame: 0.2)
         let runMom = SKAction.repeatActionForever(momChangeTexsure)
-        mom.setScale(0.6)
         mom.runAction(runMom)
         //add bottle
         let bottle = SKSpriteNode.init(imageNamed:"bottle.png")
         bottle.position = CGPointMake(mom.position.x,mom.position.y+mom.size.height*2/5)
         bottle.setScale(1)
         bottle.name = "bottle"
+        
         //add physices for bottle
         let bottlePath = CGPathCreateMutable()
         let bottleDoorWidthLeftSpace = bottle.size.width/5
@@ -486,7 +489,7 @@ class GameScene: SKScene {
         shimp.name = "shimp"
         shimp.position = CGPoint(x:ForceButton_left.x+ball_width+screen_width/2, y:ForceButton_left.y+ball_width)
         
-        let shimpChangeTexsure = SKAction.animateWithTextures(shimpTextureArray, timePerFrame: 0.2)
+        let shimpChangeTexsure = SKAction.animateWithTextures(shimpTextureArray, timePerFrame: 0.1)
         let runShimp = SKAction.repeatActionForever(shimpChangeTexsure)
         shimp.setScale(0.8)
         shimp.runAction(runShimp)
